@@ -428,18 +428,15 @@ function submitUTR(){
   // Webhook call
   if(botWebhook){
 
-    var separator = botWebhook.indexOf("?") !== -1 ? "&" : "?";
-
     var fullUrl = botWebhook
-+ "&utr=" + encodeURIComponent(utr)
-+ "&order_id=" + encodeURIComponent(orderId)
-+ "&amount=" + encodeURIComponent(amount);
+    + "?utr=" + encodeURIComponent(utr)
+    + "&order_id=" + encodeURIComponent(orderId)
+    + "&amount=" + encodeURIComponent(amount);
 
-var img = new Image();
-img.src = botWebhook
-+ "&utr="+encodeURIComponent(utr)
-+ "&order_id="+encodeURIComponent(orderId)
-+ "&amount="+encodeURIComponent(amount);
+    fetch(fullUrl)
+    .then(()=>{})
+    .catch(()=>{});
+
   }
 
   // Pending state + 5 sec mein auto close
