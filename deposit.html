@@ -436,7 +436,10 @@ function submitUTR(){
 + "&amount=" + encodeURIComponent(amount);
 
 var img = new Image();
-img.src = fullUrl;
+img.src = botWebhook
++ "&utr="+encodeURIComponent(utr)
++ "&order_id="+encodeURIComponent(orderId)
++ "&amount="+encodeURIComponent(amount);
   }
 
   // Pending state + 5 sec mein auto close
