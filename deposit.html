@@ -430,13 +430,15 @@ function submitUTR(){
 
     var separator = botWebhook.includes("?") ? "&" : "?";
 
-    var img = new Image();
+    var fullUrl = botWebhook
+    + separator
+    + "utr=" + encodeURIComponent(utr)
+    + "&order_id=" + encodeURIComponent(orderId)
+    + "&amount=" + encodeURIComponent(amount)
+    + "&user_id=" + encodeURIComponent(userId);
 
-    img.src = botWebhook
-      + separator
-      + "utr=" + encodeURIComponent(utr)
-      + "&order_id=" + encodeURIComponent(orderId)
-      + "&amount=" + encodeURIComponent(amount);
+    var img = new Image();
+    img.src = fullUrl;
   }
 
   // Pending state + 5 sec mein auto close
