@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Universal Payment</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;
+      --card:rgba(255,255,255,0.07);--card-border:rgba(255,255,255,0.12);
+      --gold:#f5c842;--gold2:#e0a800;--gold-l:rgba(245,200,66,0.12);
+      --text:#ffffff;--muted:rgba(255,255,255,0.6);--hint:rgba(255,255,255,0.3);
+      --green:#2ecc71;--green-l:rgba(46,204,113,0.15);
+      --red:#e74c3c;--red-l:rgba(231,76,60,0.15);
+      --purple:#a78bfa;--purple-l:rgba(167,139,250,0.15);
+      --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+    }
+    body{
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+      min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+      padding:2rem 1rem;position:relative;overflow-x:hidden;
+    }
+    body::before{
+      content:'';position:fixed;width:500px;height:500px;
+      background:radial-gradient(circle,rgba(167,139,250,0.15) 0%,transparent 70%);
+      top:-100px;left:-100px;border-radius:50%;
+      animation:float1 8s ease-in-out infinite;pointer-events:none;
+    }
+    body::after{
+      content:'';position:fixed;width:400px;height:400px;
+      background:radial-gradient(circle,rgba(245,200,66,0.1) 0%,transparent 70%);
+      bottom:-100px;right:-100px;border-radius:50%;
+      animation:float2 10s ease-in-out infinite;pointer-events:none;
+    }
+    @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,30px)}}
+    @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-20px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+    .spin{animation:spin 1s linear infinite;display:inline-block}
+
+    .card{
+      background:var(--card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border:1px solid var(--card-border);border-radius:var(--r-xl);
+      padding:2rem 1.75rem;max-width:420px;width:100%;
+      position:relative;z-index:1;box-shadow:0 25px 60px rgba(0,0,0,0.4);
+    }
+
+    /* Header */
+    .hdr{text-align:center;margin-bottom:1.75rem}
+    .logo-wrap{
+      width:70px;height:70px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 14px;box-shadow:0 8px 24px rgba(245,200,66,0.35);
+    }
+    .logo-wrap i{font-size:30px;color:#1a1a2e}
+    .brand-name{
+      font-size:22px;font-weight:700;
+      background:linear-gradient(135deg,#fff 0%,var(--gold) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;letter-spacing:-0.3px;
+    }
+    .brand-sub{font-size:11px;color:var(--hint);margin-top:3px;letter-spacing:1px;text-transform:uppercase}
+
+    /* Amount */
+    .amt-box{
+      background:linear-gradient(135deg,rgba(245,200,66,0.1),rgba(167,139,250,0.1));
+      border:1px solid rgba(245,200,66,0.2);
+      border-radius:var(--r-lg);padding:1.1rem 1.25rem;
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;
+    }
+    .lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+    .amt-val{font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+    .amt-val .sym{font-size:20px;font-weight:500;margin-right:2px}
+    .txn-badge{
+      font-size:11px;font-family:monospace;color:var(--muted);
+      background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;
+      display:inline-block;margin-top:3px;border:1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Invoice info */
+    .invoice-info{
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--r-md);padding:1rem 1.1rem;margin-bottom:1.25rem;
+    }
+    .info-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0}
+    .info-row:not(:last-child){border-bottom:1px solid rgba(255,255,255,0.06)}
+    .info-key{font-size:12px;color:var(--hint);display:flex;align-items:center;gap:6px}
+    .info-key i{font-size:14px;color:var(--gold)}
+    .info-val{font-size:12px;color:var(--text);font-family:monospace}
+
+    /* Status badge */
+    .status-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(245,200,66,0.15);color:var(--gold);
+      border:1px solid rgba(245,200,66,0.25);
+      border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;
+    }
+    .status-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.5s infinite}
+
+    /* Pay button */
+    .pay-btn{
+      width:100%;
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#1a1a2e;border:none;border-radius:var(--r-lg);
+      padding:16px;font-size:16px;font-weight:700;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+      transition:all .2s;box-shadow:0 6px 24px rgba(245,200,66,0.35);
+      margin-bottom:1rem;letter-spacing:0.3px;
+    }
+    .pay-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(245,200,66,0.45)}
+    .pay-btn i{font-size:20px}
+
+    /* Or divider */
+    .or-divider{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.1)}
+    .or-divider span{font-size:11px;color:var(--hint);white-space:nowrap}
+
+    /* QR section */
+    .qr-toggle{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:13px;color:var(--muted);cursor:pointer;
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--r-md);padding:10px;margin-bottom:1rem;
+      transition:all .2s;
+    }
+    .qr-toggle:hover{background:rgba(255,255,255,0.08)}
+    .qr-toggle i{font-size:16px;color:var(--gold)}
+
+    .qr-section{display:none;margin-bottom:1rem}
+    .qr-section.open{display:block}
+    .qr-wrap{
+      display:flex;flex-direction:column;align-items:center;
+      border:1px solid var(--card-border);border-radius:var(--r-lg);
+      padding:1.25rem;background:rgba(255,255,255,0.03);
+    }
+    .qr-inner{background:#fff;padding:12px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    #qrcanvas{display:block;border-radius:4px}
+    .qr-apps{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;justify-content:center}
+    .app-badge{
+      display:flex;align-items:center;gap:4px;
+      background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+      border-radius:999px;padding:4px 12px;font-size:11px;color:var(--muted);
+    }
+
+    /* UPI row */
+    .upi-row{
+      display:flex;align-items:center;gap:10px;
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--r-md);padding:12px 14px;margin-bottom:1.25rem;
+    }
+    .upi-row i{font-size:18px;color:var(--gold);flex-shrink:0}
+    .upi-txt{flex:1;font-size:13px;font-family:monospace;color:var(--text);word-break:break-all}
+    .copy-btn{
+      font-size:11px;color:var(--gold);border:1px solid rgba(245,200,66,0.4);
+      background:var(--gold-l);border-radius:var(--r-sm);padding:5px 12px;cursor:pointer;
+      white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .2s;font-weight:500;
+    }
+    .copy-btn:hover{background:rgba(245,200,66,0.2)}
+
+    /* Timer */
+    .timer-row{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:12px;color:var(--muted);
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--r-md);padding:10px;margin-bottom:1.25rem;
+    }
+    .timer-num{font-family:monospace;color:var(--gold);font-weight:700;font-size:15px}
+
+    .expired-banner{
+      display:none;background:var(--red-l);color:#ff6b6b;
+      border:1px solid rgba(231,76,60,0.3);border-radius:var(--r-md);
+      padding:10px 14px;font-size:12px;text-align:center;margin-bottom:1rem;
+    }
+
+    /* Pending */
+    .pending-state{display:none;text-align:center;padding:2.5rem 0}
+    .pend-ring{
+      width:72px;height:72px;border-radius:50%;
+      background:var(--purple-l);border:2px solid rgba(167,139,250,0.3);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+    }
+    .pend-ring i{font-size:32px;color:var(--purple)}
+    .pending-state h2{font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .pending-state p{font-size:13px;color:var(--muted);line-height:1.7}
+    .inv-chip{
+      display:inline-block;font-family:monospace;font-size:12px;
+      background:rgba(255,255,255,0.08);color:var(--gold);
+      padding:6px 14px;border-radius:999px;margin-top:12px;
+      border:1px solid rgba(245,200,66,0.2);
+    }
+
+    /* Success */
+    .success-state{display:none;text-align:center;padding:2.5rem 0}
+    .success-ring{
+      width:80px;height:80px;border-radius:50%;
+      background:var(--green-l);border:2px solid rgba(46,204,113,0.3);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+      animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    .success-ring i{font-size:36px;color:var(--green)}
+    .success-state h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .success-state p{font-size:13px;color:var(--muted);line-height:1.7}
+    .bal-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,rgba(46,204,113,0.2),rgba(46,204,113,0.05));
+      border:1px solid rgba(46,204,113,0.3);
+      color:var(--green);border-radius:999px;
+      padding:8px 20px;font-size:15px;font-weight:700;margin-top:16px;
+    }
+
+    .powered{text-align:center;margin-top:1.5rem;font-size:11px;color:var(--hint)}
+    .powered span{color:rgba(245,200,66,0.5);font-weight:600}
+
+    .toast{
+      position:fixed;bottom:28px;left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:rgba(245,200,66,0.95);color:#1a1a2e;
+      padding:10px 20px;border-radius:999px;
+      font-size:12px;font-weight:600;opacity:0;
+      transition:opacity .3s,transform .3s;
+      pointer-events:none;white-space:nowrap;
+      box-shadow:0 4px 20px rgba(245,200,66,0.4);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- MAIN -->
+  <div id="mainContent">
+    <div class="hdr">
+      <div class="logo-wrap"><i class="ti ti-world"></i></div>
+      <div class="brand-name">Universal Payment</div>
+      <div class="brand-sub">Secure · Instant · Trusted</div>
+    </div>
+
+    <div class="amt-box">
+      <div>
+        <div class="lbl">Amount to Pay</div>
+        <div class="amt-val"><span class="sym">₹</span><span id="displayAmount">...</span></div>
+      </div>
+      <div style="text-align:right">
+        <div class="lbl">Status</div>
+        <div class="status-badge"><div class="status-dot"></div>Awaiting</div>
+      </div>
+    </div>
+
+    <div class="expired-banner" id="expiredBanner">
+      <i class="ti ti-clock-off" style="vertical-align:-2px;margin-right:5px"></i>
+      Invoice expire ho gayi. Bot mein dobara /deposit karein.
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="invoice-info">
+      <div class="info-row">
+        <div class="info-key"><i class="ti ti-receipt"></i> Invoice ID</div>
+        <div class="info-val" id="invoiceIdDisplay">...</div>
+      </div>
+      <div class="info-row">
+        <div class="info-key"><i class="ti ti-wallet"></i> UPI ID</div>
+        <div class="info-val" id="upiShort">...</div>
+      </div>
+      <div class="info-row">
+        <div class="info-key"><i class="ti ti-clock"></i> Expires In</div>
+        <div class="info-val timer-num" id="timerEl">15:00</div>
+      </div>
+    </div>
+
+    <!-- Main Pay Button -->
+    <a id="payLink" href="#" target="_blank" style="text-decoration:none">
+      <button class="pay-btn" id="payBtn">
+        <i class="ti ti-bolt"></i>
+        Pay ₹<span id="payBtnAmt">...</span> via UPI
+      </button>
+    </a>
+
+    <div class="or-divider"><span>ya QR se scan karein</span></div>
+
+    <!-- QR Toggle -->
+    <div class="qr-toggle" onclick="toggleQR()">
+      <i class="ti ti-qrcode"></i>
+      <span id="qrToggleText">QR Code Dikhao</span>
+      <i class="ti ti-chevron-down" id="qrChevron"></i>
+    </div>
+
+    <div class="qr-section" id="qrSection">
+      <div class="qr-wrap">
+        <div class="qr-inner">
+          <canvas id="qrcanvas" width="200" height="200"></canvas>
+        </div>
+        <div class="qr-apps">
+          <div class="app-badge"><i class="ti ti-device-mobile"></i> GPay</div>
+          <div class="app-badge"><i class="ti ti-device-mobile"></i> PhonePe</div>
+          <div class="app-badge"><i class="ti ti-device-mobile"></i> Paytm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPI Copy -->
+    <div class="upi-row">
+      <i class="ti ti-wallet"></i>
+      <span class="upi-txt" id="upiDisplay">...</span>
+      <button class="copy-btn" onclick="copyUPI()"><i class="ti ti-copy"></i> Copy</button>
+    </div>
+
+    <div class="powered">🔒 Secured by <span>Universal Payment</span> · 256-bit SSL</div>
+  </div>
+
+  <!-- PENDING -->
+  <div class="pending-state" id="pendingState">
+    <div class="pend-ring"><i class="ti ti-loader-2 spin"></i></div>
+    <h2>Payment Verify Ho Raha Hai...</h2>
+    <p>Hum aapki payment check kar rahe hain.<br>Thodi der mein automatically<br>balance add ho jayega.</p>
+    <div class="inv-chip" id="pendingInvId"></div>
+    <div class="powered" style="margin-top:2rem">🔒 Secured by <span>Universal Payment</span></div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-state" id="successState">
+    <div class="success-ring"><i class="ti ti-check"></i></div>
+    <h2>Payment Successful! 🎉</h2>
+    <p>Aapka deposit verify ho gaya.<br>Balance automatically add ho gaya hai.</p>
+    <div class="bal-badge">
+      <i class="ti ti-wallet"></i>
+      ₹<span id="addedAmt"></span> Added Successfully
+    </div>
+    <div class="powered" style="margin-top:2rem">🔒 Secured by <span>Universal Payment</span></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+const P          = new URLSearchParams(location.search);
+const amount     = P.get('amount')    || '100';
+const upiId      = P.get('upi')       || 'dobariya.jenish@fam';
+const invoiceId  = P.get('invoice_id')|| 'INV000';
+const payLink    = P.get('pay_link')  || '#';
+const note       = P.get('note')      || 'Deposit';
+
+// Fill UI
+document.getElementById('displayAmount').textContent  = parseInt(amount).toLocaleString('en-IN');
+document.getElementById('payBtnAmt').textContent      = parseInt(amount).toLocaleString('en-IN');
+document.getElementById('upiDisplay').textContent     = upiId;
+document.getElementById('upiShort').textContent       = upiId;
+document.getElementById('invoiceIdDisplay').textContent = '#' + invoiceId;
+document.getElementById('addedAmt').textContent       = parseInt(amount).toLocaleString('en-IN');
+document.getElementById('pendingInvId').textContent   = 'Invoice: #' + invoiceId;
+document.getElementById('payLink').href               = payLink === '#'
+  ? 'upi://pay?pa=' + encodeURIComponent(upiId) + '&am=' + encodeURIComponent(amount) + '&cu=INR&tn=' + encodeURIComponent(note)
+  : payLink;
+
+// QR
+const upiURL = 'upi://pay?pa=' + encodeURIComponent(upiId)
+  + '&pn=UniversalPayment&am=' + encodeURIComponent(amount)
+  + '&cu=INR&tn=' + encodeURIComponent(note + ' ' + invoiceId);
+
+QRCode.toCanvas(document.getElementById('qrcanvas'), upiURL, {
+  width:200, margin:1, color:{dark:'#000000',light:'#ffffff'}
+}, function(err){ if(err) console.error(err); });
+
+// Timer
+var secs = 15*60;
+var timerEl = document.getElementById('timerEl');
+var tick = setInterval(function(){
+  secs--;
+  if(secs<=0){
+    clearInterval(tick);
+    timerEl.textContent='Expired';
+    timerEl.style.color='var(--red)';
+    document.getElementById('expiredBanner').style.display='block';
+    document.getElementById('payBtn').disabled=true;
+    return;
+  }
+  var m=String(Math.floor(secs/60)).padStart(2,'0');
+  var s=String(secs%60).padStart(2,'0');
+  timerEl.textContent=m+':'+s;
+},1000);
+
+// QR Toggle
+var qrOpen = false;
+function toggleQR(){
+  qrOpen = !qrOpen;
+  document.getElementById('qrSection').classList.toggle('open', qrOpen);
+  document.getElementById('qrToggleText').textContent = qrOpen ? 'QR Band Karo' : 'QR Code Dikhao';
+  document.getElementById('qrChevron').style.transform = qrOpen ? 'rotate(180deg)' : '';
+}
+
+function copyUPI(){
+  navigator.clipboard.writeText(upiId).catch(function(){
+    var el=document.createElement('textarea');
+    el.value=upiId;document.body.appendChild(el);el.select();
+    document.execCommand('copy');document.body.removeChild(el);
+  });
+  showToast('✓ UPI ID Copied!');
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+// Webhook se success aane par (TBC se call hoga)
+window.addEventListener('message', function(e){
+  if(e.data === 'payment_success') showSuccess();
+});
+function showSuccess(){
+  clearInterval(tick);
+  document.getElementById('mainContent').style.display='none';
+  document.getElementById('pendingState').style.display='none';
+  document.getElementById('successState').style.display='block';
+}
+
+// Pay button click — show pending after redirect
+document.getElementById('payBtn').addEventListener('click', function(){
+  setTimeout(function(){
+    document.getElementById('mainContent').style.display='none';
+    document.getElementById('pendingState').style.display='block';
+  }, 1500);
+});
+</script>
+</body>
+</html>
