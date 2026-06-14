@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Universal Payment</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg1:#0f0c29;--bg2:#302b63;--bg3:#24243e;
+      --card:rgba(255,255,255,0.07);--card-border:rgba(255,255,255,0.12);
+      --gold:#f5c842;--gold2:#e0a800;--gold-l:rgba(245,200,66,0.12);
+      --text:#ffffff;--muted:rgba(255,255,255,0.6);--hint:rgba(255,255,255,0.3);
+      --green:#2ecc71;--green-l:rgba(46,204,113,0.15);
+      --red:#e74c3c;--red-l:rgba(231,76,60,0.15);
+      --purple:#a78bfa;--purple-l:rgba(167,139,250,0.15);
+      --r-sm:8px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+    }
+    body{
+      font-family:'Inter',sans-serif;
+      background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 50%,var(--bg3) 100%);
+      min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+      padding:2rem 1rem;position:relative;overflow-x:hidden;
+    }
+    body::before{
+      content:'';position:fixed;width:500px;height:500px;
+      background:radial-gradient(circle,rgba(167,139,250,0.15) 0%,transparent 70%);
+      top:-100px;left:-100px;border-radius:50%;
+      animation:float1 8s ease-in-out infinite;pointer-events:none;z-index:0;
+    }
+    body::after{
+      content:'';position:fixed;width:400px;height:400px;
+      background:radial-gradient(circle,rgba(245,200,66,0.1) 0%,transparent 70%);
+      bottom:-100px;right:-100px;border-radius:50%;
+      animation:float2 10s ease-in-out infinite;pointer-events:none;z-index:0;
+    }
+    @keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,30px)}}
+    @keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-30px,-20px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    @keyframes slideUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+    .spin{animation:spin 1s linear infinite;display:inline-block}
+
+    .card{
+      background:var(--card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+      border:1px solid var(--card-border);border-radius:var(--r-xl);
+      padding:2rem 1.75rem;max-width:420px;width:100%;
+      position:relative;z-index:1;box-shadow:0 25px 60px rgba(0,0,0,0.4);
+      animation:slideUp .4s ease;
+    }
+
+    /* Header */
+    .hdr{text-align:center;margin-bottom:1.75rem}
+    .logo-wrap{
+      width:70px;height:70px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 14px;box-shadow:0 8px 24px rgba(245,200,66,0.35);
+    }
+    .logo-wrap i{font-size:30px;color:#1a1a2e}
+    .brand-name{
+      font-size:22px;font-weight:700;
+      background:linear-gradient(135deg,#fff 0%,var(--gold) 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    }
+    .brand-sub{font-size:11px;color:var(--hint);margin-top:3px;letter-spacing:1px;text-transform:uppercase}
+
+    /* Amount */
+    .amt-box{
+      background:linear-gradient(135deg,rgba(245,200,66,0.1),rgba(167,139,250,0.1));
+      border:1px solid rgba(245,200,66,0.2);border-radius:var(--r-lg);
+      padding:1.1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:1.25rem;
+    }
+    .lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+    .amt-val{font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+    .amt-val .sym{font-size:20px;font-weight:500;margin-right:2px}
+    .txn-badge{
+      font-size:11px;font-family:monospace;color:var(--muted);
+      background:rgba(255,255,255,0.08);padding:4px 10px;border-radius:6px;
+      display:inline-block;margin-top:3px;border:1px solid rgba(255,255,255,0.1);
+    }
+    .status-dot{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(245,200,66,0.12);color:var(--gold);
+      border:1px solid rgba(245,200,66,0.25);border-radius:999px;
+      padding:3px 10px;font-size:11px;font-weight:600;margin-top:4px;
+    }
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 1.5s infinite}
+
+    /* QR */
+    .qr-wrap{
+      display:flex;flex-direction:column;align-items:center;
+      border:1px solid var(--card-border);border-radius:var(--r-lg);
+      padding:1.5rem;margin-bottom:1.25rem;background:rgba(255,255,255,0.03);
+    }
+    .qr-inner{background:#fff;padding:12px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    #qrcanvas{display:block;border-radius:4px}
+    .qr-hint{font-size:11px;color:var(--muted);margin-top:12px;display:flex;align-items:center;gap:5px}
+    .qr-hint i{color:var(--gold);font-size:13px}
+    .qr-apps{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;justify-content:center}
+    .app-badge{
+      display:flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.1);border-radius:999px;
+      padding:4px 12px;font-size:11px;color:var(--muted);
+    }
+
+    /* UPI */
+    .upi-row{
+      display:flex;align-items:center;gap:10px;
+      background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+      border-radius:var(--r-md);padding:12px 14px;margin-bottom:1.25rem;
+    }
+    .upi-row i{font-size:18px;color:var(--gold);flex-shrink:0}
+    .upi-txt{flex:1;font-size:13px;font-family:monospace;color:var(--text);word-break:break-all}
+    .copy-btn{
+      font-size:11px;color:var(--gold);border:1px solid rgba(245,200,66,0.4);
+      background:var(--gold-l);border-radius:var(--r-sm);padding:5px 12px;cursor:pointer;
+      white-space:nowrap;display:flex;align-items:center;gap:4px;transition:all .2s;font-weight:500;
+    }
+    .copy-btn:hover{background:rgba(245,200,66,0.2)}
+
+    .divider{height:1px;background:rgba(255,255,255,0.08);margin:1.1rem 0}
+
+    /* Steps */
+    .steps-lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+    .step{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+    .step-n{
+      width:24px;height:24px;border-radius:50%;
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:700;color:#1a1a2e;flex-shrink:0;margin-top:1px;
+    }
+    .step-t{font-size:12px;color:var(--muted);line-height:1.7}
+    .step-t strong{color:var(--text);font-weight:600}
+
+    /* Timer */
+    .timer-row{
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-size:12px;color:var(--muted);
+      background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+      border-radius:var(--r-md);padding:10px;margin:1rem 0;
+    }
+    .timer-num{font-family:monospace;color:var(--gold);font-weight:700;font-size:15px}
+
+    /* UTR */
+    .utr-lbl{font-size:12px;color:var(--muted);margin-bottom:9px;display:flex;align-items:center;gap:5px}
+    .utr-lbl i{color:var(--gold)}
+    .utr-input-row{display:flex;gap:8px}
+    .utr-input{
+      flex:1;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+      border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-family:monospace;
+      color:var(--text);outline:none;transition:border .2s;
+    }
+    .utr-input:focus{border-color:rgba(245,200,66,0.5)}
+    .utr-input::placeholder{color:var(--hint);font-family:'Inter',sans-serif;font-size:12px}
+    .submit-btn{
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#1a1a2e;border:none;border-radius:var(--r-md);
+      padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;
+      white-space:nowrap;display:flex;align-items:center;gap:5px;
+      transition:all .2s;box-shadow:0 4px 15px rgba(245,200,66,0.3);
+    }
+    .submit-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(245,200,66,0.4)}
+    .submit-btn:disabled{background:rgba(255,255,255,0.15);color:var(--hint);box-shadow:none;transform:none;cursor:not-allowed}
+
+    .error-banner{
+      display:none;background:var(--red-l);color:#ff6b6b;
+      border:1px solid rgba(231,76,60,0.3);border-radius:var(--r-md);
+      padding:10px 14px;font-size:12px;text-align:center;margin-top:10px;
+    }
+    .expired-banner{
+      display:none;background:var(--red-l);color:#ff6b6b;
+      border:1px solid rgba(231,76,60,0.3);border-radius:var(--r-md);
+      padding:10px 14px;font-size:12px;text-align:center;margin-bottom:1rem;
+    }
+
+    /* Pending */
+    .pending-state{display:none;text-align:center;padding:2.5rem 0}
+    .pend-ring{
+      width:72px;height:72px;border-radius:50%;
+      background:var(--purple-l);border:2px solid rgba(167,139,250,0.3);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+    }
+    .pend-ring i{font-size:32px;color:var(--purple)}
+    .pending-state h2{font-size:19px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .pending-state p{font-size:13px;color:var(--muted);line-height:1.7}
+    .utr-chip{
+      display:inline-block;font-family:monospace;font-size:12px;
+      background:rgba(255,255,255,0.08);color:var(--gold);
+      padding:6px 14px;border-radius:999px;margin-top:12px;
+      border:1px solid rgba(245,200,66,0.2);
+    }
+
+    /* Success */
+    .success-state{display:none;text-align:center;padding:2.5rem 0}
+    .success-ring{
+      width:80px;height:80px;border-radius:50%;
+      background:var(--green-l);border:2px solid rgba(46,204,113,0.3);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+      animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    .success-ring i{font-size:36px;color:var(--green)}
+    .success-state h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .success-state p{font-size:13px;color:var(--muted);line-height:1.7}
+    .bal-badge{
+      display:inline-flex;align-items:center;gap:8px;
+      background:linear-gradient(135deg,rgba(46,204,113,0.2),rgba(46,204,113,0.05));
+      border:1px solid rgba(46,204,113,0.3);color:var(--green);
+      border-radius:999px;padding:8px 20px;font-size:15px;font-weight:700;margin-top:16px;
+    }
+
+    /* Rejected */
+    .reject-state{display:none;text-align:center;padding:2.5rem 0}
+    .reject-ring{
+      width:80px;height:80px;border-radius:50%;
+      background:var(--red-l);border:2px solid rgba(231,76,60,0.3);
+      display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+      animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);
+    }
+    .reject-ring i{font-size:36px;color:var(--red)}
+    .reject-state h2{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+    .reject-state p{font-size:13px;color:var(--muted);line-height:1.7}
+    .retry-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      background:linear-gradient(135deg,var(--gold),var(--gold2));
+      color:#1a1a2e;border:none;border-radius:999px;
+      padding:10px 22px;font-size:13px;font-weight:700;
+      cursor:pointer;margin-top:16px;transition:all .2s;
+    }
+
+    .powered{text-align:center;margin-top:1.5rem;font-size:11px;color:var(--hint)}
+    .powered span{color:rgba(245,200,66,0.5);font-weight:600}
+
+    .toast{
+      position:fixed;bottom:28px;left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:rgba(245,200,66,0.95);color:#1a1a2e;
+      padding:10px 20px;border-radius:999px;font-size:12px;font-weight:600;
+      opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;
+      box-shadow:0 4px 20px rgba(245,200,66,0.4);
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- MAIN -->
+  <div id="mainContent">
+    <div class="hdr">
+      <div class="logo-wrap"><i class="ti ti-world"></i></div>
+      <div class="brand-name">Universal Payment</div>
+      <div class="brand-sub">Secure · Instant · Trusted</div>
+    </div>
+
+    <div class="amt-box">
+      <div>
+        <div class="lbl">Amount to Pay</div>
+        <div class="amt-val"><span class="sym">₹</span><span id="displayAmount">...</span></div>
+      </div>
+      <div style="text-align:right">
+        <div class="lbl">Invoice ID</div>
+        <div class="txn-badge" id="orderId">...</div>
+        <div class="status-dot"><div class="dot"></div>Awaiting</div>
+      </div>
+    </div>
+
+    <div class="expired-banner" id="expiredBanner">
+      <i class="ti ti-clock-off" style="vertical-align:-2px;margin-right:5px"></i>
+      Session expire ho gayi. Bot mein dobara /deposit karein.
+    </div>
+
+    <div class="qr-wrap">
+      <div class="qr-inner">
+        <canvas id="qrcanvas" width="200" height="200"></canvas>
+      </div>
+      <div class="qr-hint"><i class="ti ti-scan"></i>Kisi bhi UPI app se scan karein</div>
+      <div class="qr-apps">
+        <div class="app-badge"><i class="ti ti-device-mobile"></i> GPay</div>
+        <div class="app-badge"><i class="ti ti-device-mobile"></i> PhonePe</div>
+        <div class="app-badge"><i class="ti ti-device-mobile"></i> Paytm</div>
+      </div>
+    </div>
+
+    <div class="upi-row">
+      <i class="ti ti-wallet"></i>
+      <span class="upi-txt" id="upiDisplay">...</span>
+      <button class="copy-btn" onclick="copyUPI()"><i class="ti ti-copy"></i> Copy</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="steps-lbl">Payment karne ka tarika</div>
+    <div class="step">
+      <div class="step-n">1</div>
+      <div class="step-t"><strong>GPay, PhonePe ya Paytm</strong> kholein</div>
+    </div>
+    <div class="step">
+      <div class="step-n">2</div>
+      <div class="step-t"><strong>QR scan</strong> karein ya UPI ID daalen — amount ₹<span id="stepAmt">...</span></div>
+    </div>
+    <div class="step">
+      <div class="step-n">3</div>
+      <div class="step-t">Payment ke baad <strong>UTR / Reference number</strong> niche daalen</div>
+    </div>
+
+    <div class="timer-row">
+      <i class="ti ti-clock" style="color:var(--gold)"></i>
+      Session expire: <span class="timer-num" id="timerEl">15:00</span>
+    </div>
+
+    <div>
+      <div class="utr-lbl">
+        <i class="ti ti-hash"></i>
+        UTR / Reference Number (payment ke baad milta hai)
+      </div>
+      <div class="utr-input-row">
+        <input class="utr-input" id="utrInput" type="number" placeholder="e.g. 426812345678"/>
+        <button class="submit-btn" id="submitBtn" onclick="submitUTR()">
+          <i class="ti ti-send"></i> Submit
+        </button>
+      </div>
+      <div class="error-banner" id="errorBanner"></div>
+    </div>
+
+    <div class="powered">🔒 Secured by <span>Universal Payment</span> · 256-bit SSL</div>
+  </div>
+
+  <!-- PENDING -->
+  <div class="pending-state" id="pendingState">
+    <div class="pend-ring"><i class="ti ti-loader-2 spin"></i></div>
+    <h2>Admin Verify Kar Raha Hai...</h2>
+    <p>Aapka UTR submit ho gaya hai.<br>Admin approve karega, thodi der mein<br>balance automatically add ho jayega.</p>
+    <div class="utr-chip" id="pendingUtr"></div>
+    <div class="powered" style="margin-top:2rem">🔒 Secured by <span>Universal Payment</span></div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-state" id="successState">
+    <div class="success-ring"><i class="ti ti-check"></i></div>
+    <h2>Payment Approved! 🎉</h2>
+    <p>Admin ne aapki payment verify kar di.<br>Balance add ho gaya hai!</p>
+    <div class="bal-badge">
+      <i class="ti ti-wallet"></i>
+      ₹<span id="addedAmt"></span> Added Successfully
+    </div>
+    <div class="powered" style="margin-top:2rem">🔒 Secured by <span>Universal Payment</span></div>
+  </div>
+
+  <!-- REJECTED -->
+  <div class="reject-state" id="rejectState">
+    <div class="reject-ring"><i class="ti ti-x"></i></div>
+    <h2>Payment Rejected ❌</h2>
+    <p>Admin ne aapki payment reject kar di.<br>Galat UTR ya payment nahi mili.<br>Dobara try karein.</p>
+    <button class="retry-btn" onclick="location.reload()">
+      <i class="ti ti-refresh"></i> Dobara Try Karein
+    </button>
+    <div class="powered" style="margin-top:2rem">🔒 Secured by <span>Universal Payment</span></div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+const P          = new URLSearchParams(location.search);
+const amount     = P.get('amount') || '100';
+const upiId      = P.get('upi')    || 'dobariya.jenish@fam';
+const note       = P.get('note')   || 'Deposit';
+const botWebhook = P.get('wh')     || '';
+const orderId    = 'UP' + Date.now().toString().slice(-10);
+
+// Fill UI
+document.getElementById('displayAmount').textContent = parseInt(amount).toLocaleString('en-IN');
+document.getElementById('stepAmt').textContent       = parseInt(amount).toLocaleString('en-IN');
+document.getElementById('upiDisplay').textContent    = upiId;
+document.getElementById('orderId').textContent       = '#' + orderId;
+document.getElementById('addedAmt').textContent      = parseInt(amount).toLocaleString('en-IN');
+
+// QR
+QRCode.toCanvas(document.getElementById('qrcanvas'),
+  'upi://pay?pa='+encodeURIComponent(upiId)+'&pn=UniversalPayment&am='+encodeURIComponent(amount)+'&cu=INR&tn='+encodeURIComponent(note+' '+orderId),
+  {width:200,margin:1,color:{dark:'#000000',light:'#ffffff'}},
+  function(e){if(e)console.error(e);}
+);
+
+// Timer
+var secs=15*60, timerEl=document.getElementById('timerEl');
+var tick=setInterval(function(){
+  secs--;
+  if(secs<=0){
+    clearInterval(tick);timerEl.textContent='Expired';timerEl.style.color='var(--red)';
+    document.getElementById('expiredBanner').style.display='block';
+    document.getElementById('submitBtn').disabled=true;
+    document.getElementById('utrInput').disabled=true;
+    return;
+  }
+  timerEl.textContent=String(Math.floor(secs/60)).padStart(2,'0')+':'+String(secs%60).padStart(2,'0');
+},1000);
+
+function copyUPI(){
+  navigator.clipboard.writeText(upiId).catch(function(){
+    var el=document.createElement('textarea');el.value=upiId;
+    document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);
+  });
+  showToast('✓ UPI ID Copied!');
+}
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2200);
+}
+
+function submitUTR(){
+  var utr=document.getElementById('utrInput').value.trim();
+  var errEl=document.getElementById('errorBanner');
+  errEl.style.display='none';
+  if(!utr||utr.length<6){
+    errEl.textContent='❌ Valid UTR number daalen (minimum 6 digits)';
+    errEl.style.display='block';return;
+  }
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.innerHTML='<i class="ti ti-loader-2 spin"></i> Submitting...';
+
+  // Webhook call
+  if(botWebhook){
+    var img=new Image();
+    img.src=botWebhook+'&utr='+encodeURIComponent(utr)+'&order_id='+encodeURIComponent(orderId);
+  }
+
+  setTimeout(function(){
+    clearInterval(tick);
+    document.getElementById('mainContent').style.display='none';
+    document.getElementById('pendingState').style.display='block';
+    document.getElementById('pendingUtr').textContent='UTR: '+utr;
+  },800);
+}
+</script>
+</body>
+</html>
