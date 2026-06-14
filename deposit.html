@@ -428,16 +428,19 @@ function submitUTR(){
   // Webhook call
   if(botWebhook){
 
-    var separator = botWebhook.includes("?") ? "&" : "?";
+    var separator = botWebhook.indexOf("?") !== -1 ? "&" : "?";
 
     var fullUrl = botWebhook
     + separator
     + "utr=" + encodeURIComponent(utr)
     + "&order_id=" + encodeURIComponent(orderId)
-    + "&amount=" + encodeURIComponent(amount)
-    + "&user_id=" + encodeURIComponent(userId);
+    + "&amount=" + encodeURIComponent(amount);
+
 
     var img = new Image();
+    img.onload = function(){};
+    img.onerror = function(){};
+
     img.src = fullUrl;
   }
 
