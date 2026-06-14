@@ -336,8 +336,9 @@ async function submitUTR() {
   const errEl = document.getElementById('errorBanner');
   errEl.style.display = 'none';
 
-  if (!utr || utr.length < 8) {
-    errEl.textContent = '❌ Valid UTR number daalen (kam se kam 8 digits)';
+  // UPI UTR standard validation check
+  if (!utr || utr.length < 8 || isNaN(utr)) {
+    errEl.textContent = '❌ Sahi UTR/Ref number daalen (kam se kam 8 digits)';
     errEl.style.display = 'block';
     return;
   }
@@ -346,42 +347,39 @@ async function submitUTR() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> Submitting...';
 
-  // ✅ Simple GET request — no-cors problem nahi hogi
+  // ✅ Stable Webhook Connection Chain
   if (botWebhook) {
     const callUrl = botWebhook
       + '&utr='      + encodeURIComponent(utr)
-      + '&order_id=' + encodeURIComponent(orderId);
+      + '&amount='   + encodeURIComponent(amount)
+      + '&order_id=' + encodeURIComponent(orderId)
+      + '&user_id='  + encodeURIComponent(userId);
 
-    // Image trick — CORS bypass, always works
-    const img = new Image();
-    img.src = callUrl;
+    try {
+      // Method 1: Standard Image source injection (Best for No-CORS)
+      const img = new Image();
+      img.src = callUrl;
+
+      // Method 2: Fast API fetch integration
+      await fetch(callUrl, { mode: 'no-cors' });
+    } catch(e) {
+      console.log("Background signal pushed.");
+    }
   }
 
-  // Show pending state
+  // Show pending state UI change smoothly
   setTimeout(() => {
     document.getElementById('mainContent').style.display = 'none';
     document.getElementById('pendingState').style.display = 'block';
     document.getElementById('pendingUtrDisplay').textContent = 'UTR: ' + utr;
-  }, 1500);
-};
-
-  // ── Call TBC webhook ──────────────────────────────────────
-  // botWebhook URL is passed from TBC via ?wh= param
-  if (botWebhook) {
-    try {
-      await fetch(botWebhook + '&utr=' + encodeURIComponent(utr)
-        + '&amount=' + encodeURIComponent(amount)
-        + '&order_id=' + encodeURIComponent(orderId)
-        + '&user_id=' + encodeURIComponent(userId), { mode: 'no-cors' });
-    } catch(e) {}
-  }
+  }, 1200);
 }
 
 // ── Listen for approval from TBC (polling via URL hash) ───
-// TBC webhook pe approved=1 aane pe page success dikhaye
 function checkApproval() {
-  if (location.hash === '#approved') {
+  if (location.hash === '#approved' || location.hash === '#success') {
     document.getElementById('pendingState').style.display  = 'none';
+    document.getElementById('mainContent').style.display   = 'none';
     document.getElementById('successState').style.display  = 'block';
   }
 }
