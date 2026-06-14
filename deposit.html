@@ -383,7 +383,7 @@
     setTimeout(() => t.classList.remove('show'), 2200);
   }
 
-// ── Mark Done (UPDATED FOR AUTO-BOT ADD) ───────────────────
+/// ── Mark Done (UPDATED FOR TELEGRAM DETECT) ───────────────────
 function markDone() {
   clearInterval(countdown);
   document.getElementById('mainContent').style.display = 'none';
@@ -392,13 +392,21 @@ function markDone() {
   // Telegram WebApp initialization
   const tg = window.Telegram.WebApp;
 
-  // Bot ko data bhejna (Format -> DONE_DEPOSIT:amount)
-  // Isse Bot ko pata chalega ki kis user ne kitna payment kiya hai
   if (tg) {
+    // Pehle WebApp ko expand kar dete hain taaki connection strong rahe
+    tg.expand(); 
+    
+    // Bot ko data bhejna (Format -> DONE_DEPOSIT:amount)
     setTimeout(() => {
-      tg.sendData(`DONE_DEPOSIT:${amount}`); // Bot ko data bhej raha hai
-      tg.close(); // WebApp ko auto-close kar dega
-    }, 1500); // 1.5 second ka delay taki user success state dekh sake
+      try {
+        tg.sendData(`DONE_DEPOSIT:${amount}`); // Telegram bot ko data bhej raha hai
+        tg.close(); // WebApp ko auto-close kar dega
+      } catch (err) {
+        alert("Telegram SDK Error: " + err.message);
+      }
+    }, 1200); 
+  } else {
+    alert("Error: Telegram WebApp detect nahi hua! Kripya ise Telegram ke andar hi kholein.");
   }
 }
 </script>
