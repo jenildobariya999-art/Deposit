@@ -431,15 +431,16 @@ function submitUTR(){
 
   /// ✅ Webhook — UTR + Order ID bot ko jayega
 if(botWebhook){
-
-    fetch(
-      botWebhook
-      + '&utr=' + encodeURIComponent(utr)
+    var fullUrl = botWebhook
+      + '?utr='      + encodeURIComponent(utr)
       + '&order_id=' + encodeURIComponent(orderId)
-      + '&amount=' + encodeURIComponent(amount)
-    );
+      + '&amount='   + encodeURIComponent(amount)
+      + '&uid='      + encodeURIComponent(userId);
 
+    var img = new Image();
+    img.src = fullUrl;
 }
+  
   // Pending state + 5 sec mein auto close
   setTimeout(function(){
     clearInterval(tick);
