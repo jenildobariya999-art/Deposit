@@ -431,12 +431,39 @@ function submitUTR(){
     img.src=botWebhook+'&utr='+encodeURIComponent(utr)+'&order_id='+encodeURIComponent(orderId);
   }
 
+  // Pending state + 5 sec mein auto close
   setTimeout(function(){
     clearInterval(tick);
-    document.getElementById('mainContent').style.display='none';
-    document.getElementById('pendingState').style.display='block';
-    document.getElementById('pendingUtr').textContent='UTR: '+utr;
-  },800);
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('pendingState').style.display = 'block';
+    document.getElementById('pendingUtr').textContent = 'UTR: ' + utr;
+
+    // ✅ 5 second countdown then close
+    var closeEl = document.createElement('div');
+    closeEl.style.cssText = 'margin-top:20px;font-size:13px;color:var(--muted)';
+    closeEl.innerHTML = 'Yeh page <span id="closeSecs" style="color:var(--gold);font-weight:700">5</span> second mein band ho jayega...';
+    document.getElementById('pendingState').appendChild(closeEl);
+
+    var c = 5;
+    var cTick = setInterval(function(){
+      c--;
+      var el = document.getElementById('closeSecs');
+      if(el) el.textContent = c;
+      if(c <= 0){
+        clearInterval(cTick);
+        window.close(); // Tab band
+        // Agar window.close() kaam na kare (browser block kare)
+        document.getElementById('pendingState').innerHTML =
+          '<div style="text-align:center;padding:2rem 0">'
+          + '<div class="pend-ring"><i class="ti ti-circle-check" style="font-size:32px;color:var(--green)"></i></div>'
+          + '<h2 style="color:var(--text);font-size:19px;font-weight:700;margin-bottom:8px">Submitted! ✅</h2>'
+          + '<p style="font-size:13px;color:var(--muted)">UTR submit ho gaya.<br>Telegram pe jao — admin verify karega.</p>'
+          + '<div style="margin-top:1rem;font-size:12px;color:var(--hint)">Yeh tab manually band kar sakte ho.</div>'
+          + '</div>';
+      }
+    }, 1000);
+
+  }, 800);
 }
 </script>
 </body>
