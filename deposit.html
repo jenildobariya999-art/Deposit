@@ -334,7 +334,6 @@ function showToast(msg) {
 async function submitUTR() {
   const utr = document.getElementById('utrInput').value.trim();
   const errEl = document.getElementById('errorBanner');
-
   errEl.style.display = 'none';
 
   if (!utr || utr.length < 8) {
@@ -347,11 +346,24 @@ async function submitUTR() {
   btn.disabled = true;
   btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 1s linear infinite"></i> Submitting...';
 
+  // ✅ Simple GET request — no-cors problem nahi hogi
+  if (botWebhook) {
+    const callUrl = botWebhook
+      + '&utr='      + encodeURIComponent(utr)
+      + '&order_id=' + encodeURIComponent(orderId);
+
+    // Image trick — CORS bypass, always works
+    const img = new Image();
+    img.src = callUrl;
+  }
+
   // Show pending state
-  clearInterval(tick);
-  document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('pendingState').style.display = 'block';
-  document.getElementById('pendingUtrDisplay').textContent = 'UTR: ' + utr;
+  setTimeout(() => {
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('pendingState').style.display = 'block';
+    document.getElementById('pendingUtrDisplay').textContent = 'UTR: ' + utr;
+  }, 1500);
+};
 
   // ── Call TBC webhook ──────────────────────────────────────
   // botWebhook URL is passed from TBC via ?wh= param
