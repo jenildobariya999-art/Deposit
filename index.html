@@ -3,183 +3,675 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deposit</title>
+<title>Loot Bot Maker · Deposit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b1020; --card:rgba(255,255,255,.07); --line:rgba(255,255,255,.14);
-  --text:#f2f4ff; --muted:#9aa4c7; --amber:#ffb703; --coral:#ff5d73; --teal:#2ee6c5; --violet:#7b5cff;
-  box-sizing:border-box;
+  --bg:#f6f7fb;
+  --surface:#ffffff;
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e5e8f0;
+  --brand:#4f46e5;
+  --brand-soft:#eef2ff;
+  --accent:#10b981;
+  --accent-soft:#ecfdf5;
+  --warn:#f59e0b;
+  --warn-soft:#fffbeb;
+  --danger:#ef4444;
+  --danger-soft:#fef2f2;
+  --fam:#7c3aed;
+  --radius:20px;
 }
-*,*::before,*::after{box-sizing:inherit}
+*,*::before,*::after{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0; min-height:100%; display:flex; align-items:center; justify-content:center; padding:20px 14px; font-family:"Outfit",system-ui,sans-serif; color:var(--text); background:var(--bg); overflow-x:hidden}
-.aurora{position:fixed; inset:0; z-index:-1; overflow:hidden}
-.aurora i{position:absolute; width:55vmax; height:55vmax; border-radius:50%; filter:blur(80px); opacity:.45; animation:drift 18s ease-in-out infinite alternate}
-.aurora i:nth-child(1){background:var(--violet); top:-20vmax; left:-15vmax}
-.aurora i:nth-child(2){background:var(--teal); bottom:-25vmax; right:-15vmax; animation-duration:23s; opacity:.32}
-.aurora i:nth-child(3){background:var(--coral); top:35%; left:45%; width:30vmax; height:30vmax; animation-duration:15s; opacity:.22}
-@keyframes drift{to{transform:translate(8vmax,6vmax) scale(1.2)}}
+body{
+  margin:0;
+  min-height:100%;
+  font-family:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+.page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 0 40px;
+}
+.topbar{
+  width:100%;
+  background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 100%);
+  color:#fff;
+  padding:20px 20px 18px;
+  position:relative;
+  overflow:hidden;
+}
+.topbar::after{
+  content:"";
+  position:absolute;
+  top:-60px;right:-40px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(124,58,237,.55),transparent 70%);
+  filter:blur(30px);
+  pointer-events:none;
+}
+.topbar::before{
+  content:"";
+  position:absolute;
+  bottom:-80px;left:-40px;
+  width:220px;height:220px;
+  background:radial-gradient(circle,rgba(16,185,129,.35),transparent 70%);
+  filter:blur(30px);
+  pointer-events:none;
+}
+.topbar-inner{
+  max-width:500px;
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+}
+.brand{
+  display:flex;align-items:center;gap:11px;
+  margin-bottom:16px;
+}
+.brand-icon{
+  width:38px;height:38px;
+  border-radius:11px;
+  background:linear-gradient(135deg,#6366f1,#a855f7);
+  display:grid;place-items:center;
+  font-size:19px;
+  box-shadow:0 4px 14px rgba(139,92,246,.5);
+}
+.brand-text{
+  font-weight:800;
+  font-size:1rem;
+  letter-spacing:-.01em;
+  line-height:1.15;
+}
+.brand-text small{
+  display:block;
+  font-weight:500;
+  font-size:.7rem;
+  color:rgba(255,255,255,.5);
+  letter-spacing:.02em;
+  margin-top:2px;
+}
+.brand-text .tag{
+  display:inline-block;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.12);
+  padding:2px 7px;
+  border-radius:6px;
+  font-size:.6rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#c4b5fd;
+  margin-left:6px;
+  vertical-align:middle;
+}
+.topbar-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.topbar-item{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:10px 12px;
+}
+.topbar-item.full{grid-column:1 / -1}
+.topbar-item .label{
+  font-size:.62rem;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.45);
+  margin-bottom:4px;
+}
+.topbar-item .value{
+  font-family:"JetBrains Mono",monospace;
+  font-size:.82rem;
+  font-weight:600;
+  color:#fff;
+  word-break:break-all;
+  line-height:1.3;
+}
+.topbar-item .value.big{
+  font-size:1.35rem;
+  font-family:"Plus Jakarta Sans",sans-serif;
+  letter-spacing:-.02em;
+}
+.status-live{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.68rem;font-weight:600;
+  color:#6ee7b7;
+}
+.status-live i{
+  width:6px;height:6px;border-radius:50%;
+  background:#10b981;
+  box-shadow:0 0 0 0 rgba(16,185,129,.6);
+  animation:ping 2s ease-out infinite;
+}
+@keyframes ping{70%,100%{box-shadow:0 0 0 8px rgba(16,185,129,0)}}
 
-.card{display:none; width:100%; max-width:440px; padding:32px 24px 26px; text-align:center; background:var(--card); border:1px solid var(--line); border-radius:32px; backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); box-shadow:0 30px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12)}
+.wrap{
+  width:100%;
+  max-width:500px;
+  padding:0 16px;
+  margin-top:-14px;
+  position:relative;
+  z-index:2;
+}
+.card{
+  display:none;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:28px 22px 24px;
+  box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 32px -8px rgba(15,23,42,.10);
+}
 body[data-view=amount] #amountView,
 body[data-view=loading] #loadingView,
 body[data-view=qr] #qrView,
-body[data-view=result] #resultView{display:block; animation:cardIn .7s cubic-bezier(.2,.9,.25,1.1) both}
-@keyframes cardIn{from{opacity:0; transform:translateY(40px) scale(.94)}}
+body[data-view=result] #resultView{
+  display:block;
+  animation:cardIn .5s cubic-bezier(.2,.9,.3,1.05) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px)}}
 
-.coin{width:92px; height:92px; margin:0 auto 18px; border-radius:50%; display:grid; place-items:center; font-size:46px; font-weight:800; color:#5a3b00; background:radial-gradient(circle at 30% 25%,#ffe38a,var(--amber) 55%,#c98500); box-shadow:0 12px 30px rgba(255,183,3,.45), inset 0 -6px 10px rgba(0,0,0,.18); animation:floaty 3.2s ease-in-out infinite}
-@keyframes floaty{50%{transform:translateY(-10px) rotate(8deg)}}
-h1{margin:0 0 6px; font-size:1.7rem; font-weight:700}
-.sub{margin:0 0 22px; color:var(--muted)}
-.field{display:flex; align-items:center; gap:10px; padding:0 22px; height:76px; border-radius:22px; background:rgba(0,0,0,.28); border:1px solid var(--line); transition:.25s}
-.field:focus-within{border-color:var(--amber); box-shadow:0 0 0 4px rgba(255,183,3,.2)}
-.field b{font-size:2rem; color:var(--amber)}
-.field input{flex:1; min-width:0; border:0; outline:0; background:none; color:var(--text); font:700 2.2rem "Outfit",sans-serif}
-.field input::placeholder{color:#5d688f}
+h1{
+  margin:0 0 6px;
+  font-size:1.45rem;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+.sub{
+  margin:0 0 22px;
+  color:var(--muted);
+  font-size:.92rem;
+  line-height:1.55;
+}
+.coin{
+  width:76px;height:76px;
+  margin:0 auto 18px;
+  border-radius:22px;
+  display:grid;place-items:center;
+  font-size:34px;font-weight:800;
+  color:#fff;
+  background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%);
+  box-shadow:0 12px 28px -8px rgba(139,92,246,.55);
+  animation:floaty 3.5s ease-in-out infinite;
+}
+@keyframes floaty{50%{transform:translateY(-6px)}}
+.field{
+  display:flex;align-items:center;gap:10px;
+  padding:0 18px;height:72px;
+  background:#f8fafc;
+  border:2px solid var(--line);
+  border-radius:16px;
+  transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.field:focus-within{
+  border-color:var(--brand);
+  background:#fff;
+  box-shadow:0 0 0 4px var(--brand-soft);
+}
+.field b{font-size:1.6rem;font-weight:700;color:var(--brand)}
+.field input{
+  flex:1;min-width:0;
+  border:0;outline:0;background:none;
+  color:var(--ink);
+  font:800 2rem "Plus Jakarta Sans",sans-serif;
+  letter-spacing:-.03em;
+}
+.field input::placeholder{color:#cbd5e1}
+.field input::-webkit-outer-spin-button,
+.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.field input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .field.shake{animation:shake .4s}
-@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-.chips{display:flex; gap:10px; margin:14px 0 8px}
-.chips button{flex:1; padding:9px 0; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--text); font:600 1rem "Outfit",sans-serif; cursor:pointer; transition:.2s}
-.chips button:hover{background:rgba(255,183,3,.18); border-color:var(--amber); transform:translateY(-2px)}
-.limits{margin:6px 0 24px; color:var(--muted); font-size:.9rem}
-.btn{position:relative; overflow:hidden; display:block; width:100%; height:62px; margin-bottom:12px; border:0; border-radius:20px; font:700 1.15rem "Outfit",sans-serif; cursor:pointer; color:#1b1200; transition:transform .15s}
-.btn:active{transform:scale(.97)}
-.btn:disabled{opacity:.6; cursor:wait}
-.btn-main{background:linear-gradient(120deg,#ffd166,var(--amber) 50%,#ff9b00); box-shadow:0 10px 28px rgba(255,183,3,.35)}
-.btn-main::after{content:""; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent); transform:skewX(-20deg); animation:shine 3s infinite}
-@keyframes shine{60%,100%{left:130%}}
-.secure{margin:14px 0 0; color:var(--muted); font-size:.9rem}
-button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--teal); outline-offset:3px}
+@keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+.chips{display:flex;gap:8px;margin:12px 0 8px}
+.chips button{
+  flex:1;padding:11px 0;
+  border-radius:12px;
+  border:1.5px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  font:600 .9rem "Plus Jakarta Sans",sans-serif;
+  cursor:pointer;
+  transition:.18s;
+}
+.chips button:hover{
+  background:var(--brand-soft);
+  border-color:var(--brand);
+  color:var(--brand);
+  transform:translateY(-1px);
+}
+.chips button:active{transform:scale(.97)}
+.limits{margin:8px 0 22px;color:var(--muted);font-size:.82rem;text-align:center}
 
-#loadingView{padding:70px 24px}
-.orbit{position:relative; width:110px; height:110px; margin:0 auto 26px}
-.orbit span{position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:var(--amber); animation:spin 1s linear infinite}
-.orbit span:nth-child(2){inset:14px; border-top-color:var(--teal); animation-duration:1.4s; animation-direction:reverse}
-.orbit span:nth-child(3){inset:28px; border-top-color:var(--coral); animation-duration:.8s}
-.orbit em{position:absolute; inset:0; display:grid; place-items:center; font-style:normal; font-size:30px}
+.btn{
+  display:block;width:100%;height:54px;
+  border:0;border-radius:14px;
+  font:700 1rem "Plus Jakarta Sans",sans-serif;
+  cursor:pointer;
+  transition:transform .15s,box-shadow .2s,background .2s;
+}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.55;cursor:wait}
+.btn-main{
+  background:linear-gradient(135deg,#4f46e5,#7c3aed);
+  color:#fff;
+  box-shadow:0 8px 20px -6px rgba(79,70,229,.45);
+}
+.btn-main:hover{
+  box-shadow:0 12px 26px -6px rgba(79,70,229,.55);
+  transform:translateY(-1px);
+}
+.secure{
+  margin:14px 0 0;
+  text-align:center;
+  color:var(--muted);
+  font-size:.8rem;
+}
+.secure b{color:var(--brand)}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
+  outline:3px solid var(--brand);
+  outline-offset:3px;
+}
+#loadingView{padding:60px 22px 50px;text-align:center}
+.spinner{
+  width:64px;height:64px;
+  margin:0 auto 24px;
+  border:4px solid var(--brand-soft);
+  border-top-color:var(--brand);
+  border-radius:50%;
+  animation:spin .9s linear infinite;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
-.dots::after{content:""; animation:dots 1.4s steps(4) infinite}
+.dots::after{content:"";animation:dots 1.4s steps(4) infinite}
 @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
-.step{margin:0 0 10px; color:var(--muted); font-size:.85rem; font-weight:600; text-align:left}
-.step b{color:var(--amber)}
-.amt{font-size:3rem; font-weight:800; margin:0 0 14px; line-height:1.1; background:linear-gradient(90deg,#fff,var(--amber)); -webkit-background-clip:text; background-clip:text; color:transparent}
-.qrbox{position:relative; width:260px; max-width:100%; margin:0 auto 14px; padding:15px; border-radius:26px; background:#fff; animation:glow 2.4s ease-out infinite}
-@keyframes glow{0%{box-shadow:0 0 0 0 rgba(46,230,197,.5)}70%,100%{box-shadow:0 0 0 22px rgba(46,230,197,0)}}
-#qr{width:100%; aspect-ratio:1; display:grid; place-items:center; animation:qrIn .8s .1s both}
-#qr img,#qr canvas{width:100%!important; height:auto!important; display:block}
-@keyframes qrIn{from{opacity:0; transform:scale(.7) rotate(-6deg); filter:blur(8px)}}
-.scan{position:absolute; left:15px; right:15px; top:15px; height:3px; border-radius:3px; background:var(--teal); box-shadow:0 0 14px 3px var(--teal); animation:scan 2.2s ease-in-out infinite alternate}
-@keyframes scan{to{top:calc(100% - 18px)}}
-.qrlogo{position:absolute; top:50%; left:50%; width:48px; height:48px; transform:translate(-50%,-50%); border-radius:14px; background:#fff; display:grid; place-items:center; font-size:26px; font-weight:800; color:#0b1020; box-shadow:0 0 0 4px #fff}
-.upi{display:flex; align-items:center; justify-content:center; gap:10px; margin:0 0 12px; color:var(--muted); font-size:.95rem; word-break:break-all}
-.upi button{background:none; border:1px solid var(--line); color:var(--amber); border-radius:10px; padding:4px 10px; font:600 .85rem "Outfit",sans-serif; cursor:pointer}
-.timer{margin:0 auto 16px; max-width:260px}
-.timer p{margin:0 0 6px; font-weight:600; font-size:.95rem}
-.bar{height:6px; border-radius:6px; background:rgba(255,255,255,.14); overflow:hidden}
-.bar i{display:block; height:100%; width:100%; border-radius:6px; background:linear-gradient(90deg,var(--teal),var(--amber),var(--coral)); transform-origin:left; transition:transform 1s linear}
-.pay{display:flex; align-items:center; justify-content:center; gap:8px; height:56px; margin-bottom:20px; border-radius:18px; background:var(--teal); color:#032b24; font:700 1.05rem "Outfit",sans-serif; text-decoration:none; box-shadow:0 8px 22px rgba(46,230,197,.3); transition:.2s}
-.pay:hover{transform:translateY(-2px)}
-.verify{padding-top:16px; border-top:1px dashed var(--line)}
-.verify .field{height:60px; margin-bottom:12px; border-radius:18px}
-.verify .field input{font:500 1.15rem "JetBrains Mono",monospace; letter-spacing:.04em}
-#statusMsg{min-height:1.3em; margin:4px 0 0; color:var(--coral); font-weight:600; font-size:.9rem}
-
-.mark{width:104px; height:104px; margin:6px auto 16px; display:block}
-.mark circle{fill:none; stroke-width:5; stroke-dasharray:300; stroke-dashoffset:300; animation:draw .7s .1s forwards}
-.mark path{fill:none; stroke-width:6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:70; stroke-dashoffset:70; animation:draw .5s .7s forwards}
-.ok .mark *{stroke:var(--teal)} .bad .mark *{stroke:var(--coral)} .warn .mark *{stroke:var(--amber)}
+.step{
+  display:flex;align-items:center;gap:8px;
+  margin:0 0 14px;
+  font-size:.75rem;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;
+  color:var(--muted);
+  text-align:left;
+}
+.step b{
+  display:inline-grid;place-items:center;
+  width:20px;height:20px;
+  background:var(--brand);
+  color:#fff;
+  border-radius:6px;
+  font-size:.7rem;
+}
+.amt{
+  margin:0 0 18px;
+  font-size:2.6rem;font-weight:800;
+  letter-spacing:-.03em;
+  color:var(--ink);
+  text-align:center;
+}
+.qrbox{
+  position:relative;
+  width:240px;max-width:100%;
+  margin:0 auto 16px;
+  padding:14px;
+  background:#fff;
+  border:1.5px solid var(--line);
+  border-radius:20px;
+  box-shadow:0 4px 16px rgba(15,23,42,.06);
+}
+#qr{
+  width:100%;aspect-ratio:1;
+  display:grid;place-items:center;
+  animation:qrIn .6s .1s both;
+}
+#qr img,#qr canvas{width:100%!important;height:auto!important;display:block}
+@keyframes qrIn{from{opacity:0;transform:scale(.82)}}
+.scan{
+  position:absolute;left:14px;right:14px;top:14px;height:2px;
+  border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--brand),transparent);
+  box-shadow:0 0 12px var(--brand);
+  animation:scan 2.4s ease-in-out infinite alternate;
+}
+@keyframes scan{to{top:calc(100% - 16px)}}
+.qrlogo{
+  position:absolute;top:50%;left:50%;
+  width:42px;height:42px;
+  transform:translate(-50%,-50%);
+  border-radius:12px;
+  background:#fff;
+  border:1.5px solid var(--line);
+  display:grid;place-items:center;
+  font-size:20px;font-weight:800;
+  color:var(--brand);
+  box-shadow:0 4px 10px rgba(15,23,42,.08);
+}
+.upi{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin:0 0 16px;
+  color:var(--muted);
+  font-size:.88rem;
+  word-break:break-all;
+}
+.upi span{
+  font-family:"JetBrains Mono",monospace;
+  font-weight:600;
+  color:var(--ink);
+}
+.upi button{
+  background:var(--brand-soft);
+  border:0;
+  color:var(--brand);
+  border-radius:9px;
+  padding:5px 11px;
+  font:600 .78rem "Plus Jakarta Sans",sans-serif;
+  cursor:pointer;
+  transition:.18s;
+}
+.upi button:hover{background:#e0e7ff}
+.timer{margin:0 auto 18px;max-width:240px}
+.timer p{
+  margin:0 0 7px;
+  font-size:.82rem;
+  font-weight:600;
+  color:var(--muted);
+  text-align:center;
+}
+.timer p span{
+  font-family:"JetBrains Mono",monospace;
+  color:var(--ink);
+}
+.bar{
+  height:6px;border-radius:6px;
+  background:#eef2ff;
+  overflow:hidden;
+}
+.bar i{
+  display:block;height:100%;width:100%;
+  border-radius:6px;
+  background:linear-gradient(90deg,#10b981,#4f46e5);
+  transform-origin:left;
+  transition:transform 1s linear;
+}
+.pay{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  height:54px;margin-bottom:8px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  color:#fff;
+  font:700 1rem "Plus Jakarta Sans",sans-serif;
+  text-decoration:none;
+  box-shadow:0 8px 22px -6px rgba(124,58,237,.5);
+  transition:transform .15s,box-shadow .2s;
+  position:relative;
+  overflow:hidden;
+}
+.pay::before{
+  content:"";
+  position:absolute;
+  top:0;left:-60%;
+  width:40%;height:100%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:skewX(-20deg);
+  animation:shine 3s infinite;
+}
+@keyframes shine{60%,100%{left:140%}}
+.pay:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 28px -6px rgba(124,58,237,.6);
+}
+.pay-icon{
+  width:22px;height:22px;
+  border-radius:6px;
+  background:rgba(255,255,255,.2);
+  display:grid;place-items:center;
+  font-size:12px;
+  font-weight:800;
+}
+.pay small{
+  display:block;
+  font-size:.62rem;
+  font-weight:600;
+  opacity:.75;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-top:1px;
+}
+.pay span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.1}
+.fam-note{
+  text-align:center;
+  font-size:.72rem;
+  color:var(--muted);
+  margin:0 0 20px;
+}
+.fam-note b{color:var(--fam)}
+.verify{padding-top:20px;border-top:1px solid var(--line)}
+.verify .field{height:56px;border-radius:14px}
+.verify .field input{font:600 1rem "JetBrains Mono",monospace;letter-spacing:.04em}
+#statusMsg{
+  min-height:1.3em;margin:6px 0 0;
+  color:var(--danger);
+  font-weight:600;font-size:.85rem;
+  text-align:center;
+}
+.mark{
+  width:80px;height:80px;
+  margin:4px auto 18px;
+  display:block;
+  padding:12px;
+  border-radius:50%;
+}
+.ok .mark{background:var(--accent-soft)}
+.bad .mark{background:var(--danger-soft)}
+.warn .mark{background:var(--warn-soft)}
+.mark circle{fill:none;stroke-width:5;stroke-dasharray:300;stroke-dashoffset:300;animation:draw .7s .1s forwards}
+.mark path{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:70;stroke-dashoffset:70;animation:draw .5s .7s forwards}
+.ok .mark *{stroke:var(--accent)}
+.bad .mark *{stroke:var(--danger)}
+.warn .mark *{stroke:var(--warn)}
 @keyframes draw{to{stroke-dashoffset:0}}
-.rows{margin:18px 0 12px; border:1px solid var(--line); border-radius:18px; overflow:hidden; text-align:left; background:rgba(0,0,0,.2)}
-.rows div{display:flex; justify-content:space-between; gap:16px; padding:11px 16px; border-bottom:1px solid var(--line); font-size:.95rem}
-.rows div:last-child{border:0}
-.rows span{color:var(--muted); text-transform:capitalize; flex:none}
-.rows b{font:500 .9rem "JetBrains Mono",monospace; text-align:right; word-break:break-all}
-.note{margin:0 0 14px; padding:10px 14px; border-radius:14px; font-weight:600; font-size:.92rem}
-.note.good{background:rgba(46,230,197,.14); color:var(--teal)} .note.alert{background:rgba(255,183,3,.14); color:var(--amber)}
-details{margin-bottom:16px; text-align:left; color:var(--muted); font-size:.85rem}
-details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,0,0,.3); white-space:pre-wrap; word-break:break-all; font:500 .8rem "JetBrains Mono",monospace; color:var(--text)}
-.confetti{position:fixed; top:-12px; width:9px; height:14px; border-radius:2px; animation:fall linear forwards; pointer-events:none}
+#resultView{text-align:center}
+.rows{
+  margin:18px 0 14px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  text-align:left;
+  background:#fafbfe;
+}
+.rows div{
+  display:flex;justify-content:space-between;gap:14px;
+  padding:11px 15px;
+  border-bottom:1px solid var(--line);
+  font-size:.88rem;
+}
+.rows div:last-child{border-bottom:0}
+.rows span{
+  color:var(--muted);
+  text-transform:capitalize;
+  flex:none;
+  font-size:.82rem;
+  font-weight:500;
+}
+.rows b{
+  font:600 .8rem "JetBrains Mono",monospace;
+  text-align:right;
+  word-break:break-all;
+}
+.note{
+  margin:0 0 14px;
+  padding:12px 15px;
+  border-radius:12px;
+  font-weight:600;
+  font-size:.86rem;
+  text-align:center;
+}
+.note.good{background:var(--accent-soft);color:#047857}
+.note.alert{background:var(--warn-soft);color:#b45309}
+details{
+  margin-bottom:16px;
+  text-align:left;
+  color:var(--muted);
+  font-size:.82rem;
+}
+details summary{
+  cursor:pointer;
+  padding:8px 0;
+  font-weight:600;
+  color:var(--ink);
+}
+details pre{
+  margin:8px 0 0;
+  padding:13px;
+  border-radius:12px;
+  background:#0f172a;
+  white-space:pre-wrap;word-break:break-all;
+  font:500 .75rem/1.6 "JetBrains Mono",monospace;
+  color:#a5f3fc;
+  max-height:220px;overflow:auto;
+}
+.confetti{
+  position:fixed;top:-14px;
+  width:8px;height:13px;
+  border-radius:2px;
+  animation:fall linear forwards;
+  pointer-events:none;
+  z-index:99;
+}
 @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-
-@media(max-width:360px){.card{padding:26px 16px 22px}.amt{font-size:2.5rem}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important; animation-iteration-count:1!important}}
+@media(max-width:400px){
+  .topbar{padding:16px 14px 14px}
+  .topbar-item .value.big{font-size:1.15rem}
+  .card{padding:24px 16px 20px}
+  .amt{font-size:2.2rem}
+  h1{font-size:1.3rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body data-view="amount">
-<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 
-<!-- 1. Amount (only shown when the link has no amount) -->
-<main class="card" id="amountView">
-  <div class="coin" aria-hidden="true">₹</div>
-  <h1>Add money</h1>
-  <p class="sub">Enter an amount and we'll make your UPI QR.</p>
-  <label class="field" id="field"><b>₹</b>
-    <input id="amount" type="number" inputmode="decimal" min="1" max="10000000" placeholder="0" aria-label="Amount in rupees">
-  </label>
-  <div class="chips">
-    <button type="button" data-amt="100">₹100</button>
-    <button type="button" data-amt="500">₹500</button>
-    <button type="button" data-amt="1000">₹1,000</button>
+<div class="page">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon">₹</div>
+        <div class="brand-text">
+          Loot Bot Maker <span class="tag">UPI</span>
+          <small>Jenish Dobariya · Secure Deposit</small>
+        </div>
+      </div>
+      <div class="topbar-grid">
+        <div class="topbar-item">
+          <div class="label">Payee UPI ID</div>
+          <div class="value">dobariya.jenish@fam</div>
+        </div>
+        <div class="topbar-item">
+          <div class="label">Status</div>
+          <div class="value"><span class="status-live"><i></i>Active</span></div>
+        </div>
+        <div class="topbar-item">
+          <div class="label">Amount</div>
+          <div class="value big" id="topAmount">₹0</div>
+        </div>
+        <div class="topbar-item">
+          <div class="label">Time Left</div>
+          <div class="value" id="topTimer">30:00</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main class="card" id="amountView">
+      <div class="coin" aria-hidden="true">₹</div>
+      <h1 style="text-align:center">Add money</h1>
+      <p class="sub" style="text-align:center">Enter an amount and we'll create your UPI QR instantly.</p>
+      <label class="field" id="field"><b>₹</b>
+        <input id="amount" type="number" inputmode="decimal" min="1" max="10000000" placeholder="0" aria-label="Amount in rupees">
+      </label>
+      <div class="chips">
+        <button type="button" data-amt="100">₹100</button>
+        <button type="button" data-amt="500">₹500</button>
+        <button type="button" data-amt="1000">₹1,000</button>
+      </div>
+      <p class="limits">Min ₹1 · Max ₹1,00,00,000</p>
+      <button class="btn btn-main" id="proceedBtn" type="button">Generate QR</button>
+      <p class="secure">🔒 100% secure · Powered by <b>Loot Bot Maker</b></p>
+    </main>
+
+    <section class="card" id="loadingView" aria-live="polite">
+      <div class="spinner"></div>
+      <h1 id="loadTitle" style="text-align:center">Creating payment<span class="dots"></span></h1>
+      <p class="sub" id="loadSub" style="text-align:center">Generating your secure QR.</p>
+    </section>
+
+    <section class="card" id="qrView">
+      <p class="step"><b>1</b> Scan the QR or tap Pay Now</p>
+      <div class="amt" id="amountShown">₹1</div>
+      <div class="qrbox">
+        <div id="qr" role="img" aria-label="UPI payment QR code"></div>
+        <div class="scan" aria-hidden="true"></div>
+        <div class="qrlogo" aria-hidden="true">₹</div>
+      </div>
+      <div class="upi"><span id="upiText"></span><button id="copyBtn" type="button">Copy</button></div>
+      <div class="timer" role="timer">
+        <p>Time left: <span id="timeLeft">29:59</span></p>
+        <div class="bar"><i id="barFill"></i></div>
+      </div>
+
+      <!-- FamPay button -->
+      <a class="pay" id="payNowBtn" href="#">
+        <span class="pay-icon">F</span>
+        <span>
+          Pay with FamPay
+          <small>Opens directly in app</small>
+        </span>
+      </a>
+      <p class="fam-note">Tap <b>Pay with FamPay</b> — opens the payment screen inside the FamPay app.</p>
+
+      <div class="verify">
+        <p class="step"><b>2</b> Enter your UTR / transaction ID</p>
+        <label class="field" id="utrField"><input id="utr" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 412345678901" aria-label="UTR or transaction ID"></label>
+        <button class="btn btn-main" id="verifyBtn" type="button">Verify payment</button>
+        <p id="statusMsg" role="status"></p>
+      </div>
+    </section>
+
+    <section class="card" id="resultView" aria-live="polite">
+      <svg class="mark" viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="48"/><path id="markPath" d="M33 57l16 16 29-33"/></svg>
+      <h1 id="resTitle"></h1>
+      <p class="sub" id="resSub"></p>
+      <div id="resNote"></div>
+      <div class="rows" id="resRows"></div>
+      <details><summary>Raw response</summary><pre id="rawJson"></pre></details>
+      <button class="btn btn-main" id="againBtn" type="button">Done</button>
+    </section>
   </div>
-  <p class="limits">Min ₹1 · Max ₹1,00,00,000</p>
-  <button class="btn btn-main" id="proceedBtn" type="button">Generate QR</button>
-  <p class="secure">🔒 Secure UPI payment</p>
-</main>
+</div>
 
-<!-- 2. Loading -->
-<section class="card" id="loadingView" aria-live="polite">
-  <div class="orbit"><span></span><span></span><span></span><em>⚡</em></div>
-  <h1 id="loadTitle">Creating payment<span class="dots"></span></h1>
-  <p class="sub" id="loadSub">Generating your secure QR.</p>
-</section>
-
-<!-- 3. QR + verify -->
-<section class="card" id="qrView">
-  <p class="step"><b>Step 1</b> · Scan the QR or tap Pay Now</p>
-  <div class="amt" id="amountShown">₹1</div>
-  <div class="qrbox">
-    <div id="qr" role="img" aria-label="UPI payment QR code"></div>
-    <div class="scan" aria-hidden="true"></div>
-    <div class="qrlogo" aria-hidden="true">₹</div>
-  </div>
-  <div class="upi"><span id="upiText"></span><button id="copyBtn" type="button">Copy</button></div>
-  <div class="timer" role="timer">
-    <p>Time left: <span id="timeLeft">29:59</span></p>
-    <div class="bar"><i id="barFill"></i></div>
-  </div>
-  <a class="pay" id="payNowBtn" href="#">➤ Pay Now</a>
-  <div class="verify">
-    <p class="step"><b>Step 2</b> · Enter your UTR / transaction ID</p>
-    <label class="field" id="utrField"><input id="utr" type="text" inputmode="numeric" autocomplete="off" placeholder="e.g. 412345678901" aria-label="UTR or transaction ID"></label>
-    <button class="btn btn-main" id="verifyBtn" type="button">Verify payment</button>
-    <p id="statusMsg" role="status"></p>
-  </div>
-</section>
-
-<!-- 4. Result -->
-<section class="card" id="resultView" aria-live="polite">
-  <svg class="mark" viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="48"/><path id="markPath" d="M33 57l16 16 29-33"/></svg>
-  <h1 id="resTitle"></h1>
-  <p class="sub" id="resSub"></p>
-  <div id="resNote"></div>
-  <div class="rows" id="resRows"></div>
-  <details><summary>Raw response</summary><pre id="rawJson"></pre></details>
-  <button class="btn btn-main" id="againBtn" type="button">Done</button>
-</section>
-
-<!--
-  script.js is NOT loaded here: it replaces the whole page with raw JSON.
-  Its logic (same ?details= UTR check, same API URL) now lives below.
-  Raw mode is kept: open  ?details=UTR&format=json  to get the old plain JSON output.
--->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function(){
   var UPI_ID = "dobariya.jenish@fam", PAYEE = "Jenish Dobariya", TOTAL = 30*60;
+  // ✅ Correct Android package for FamPay
+  var FAMPAY_PKG = "in.fampay.app";
+  var FAMPAY_STORE = "https://play.google.com/store/apps/details?id=in.fampay.app";
   var API = "https://script.google.com/macros/s/AKfycbx-mJyjZLjFLhjSzp-2F8Hz3ThNDtZ75xbujAtqL2aApNVlktLHO6fMp772lNOtJKPN/exec";
   var params = new URLSearchParams(window.location.search);
   var utrParam = (params.get("details") || "").trim();
@@ -192,9 +684,9 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
   function apiUrl(utr){ return API + "?utr=" + encodeURIComponent(utr) + (amount ? "&amount=" + amount : ""); }
   function fmt(n){ return "₹" + Number(n).toLocaleString("en-IN"); }
 
-  /* ---- Raw JSON mode: same output as the original script.js ---- */
   if (params.get("format") === "json" || params.get("raw") === "1") {
-    body.style = "margin:8px; font-family:monospace; font-size:13px; background:white; color:black; word-wrap:break-word;";
+    body.style = "display:block; margin:8px; padding:0; font-family:monospace; font-size:13px; background:white; color:black; word-wrap:break-word;";
+    var pg = document.querySelector('.page'); if (pg) pg.style.display = 'none';
     if (!utrParam) { body.innerText = JSON.stringify({success:false, error:"Invalid format"}); return; }
     fetch(apiUrl(utrParam)).then(function(r){ return r.json(); })
       .then(function(d){ body.innerText = JSON.stringify(d); })
@@ -202,40 +694,74 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
     return;
   }
 
-  /* ---- QR ---- */
-  function upiLink(){
-    var u = "upi://pay?pa=" + encodeURIComponent(UPI_ID) + "&pn=" + encodeURIComponent(PAYEE) + "&cu=INR";
-    if (amount) u += "&am=" + amount.toFixed(2) + "&tn=" + encodeURIComponent("Deposit Rs " + amount);
-    return u;
+  function setTopAmount(v){ $("topAmount").textContent = (v === null || v === undefined) ? "—" : fmt(v); }
+  function setTopTimer(s){
+    $("topTimer").textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
   }
+
+  function upiQuery(){
+    var q = "pa=" + encodeURIComponent(UPI_ID) + "&pn=" + encodeURIComponent(PAYEE) + "&cu=INR";
+    if (amount) q += "&am=" + amount.toFixed(2) + "&tn=" + encodeURIComponent("Deposit Rs " + amount);
+    return q;
+  }
+  function upiLink(){ return "upi://pay?" + upiQuery(); }
+
+  /* ---- Android Intent that opens FamPay directly ---- */
+  function fampayLink(){
+    var q = upiQuery();
+    var ua = navigator.userAgent || "";
+    var isAndroid = /android/i.test(ua);
+
+    if (isAndroid) {
+      // ✅ Correct intent: package = in.fampay.app
+      // Fallback: open Play Store if FamPay is not installed
+      return "intent://pay?" + q +
+             "#Intent;scheme=upi;package=" + FAMPAY_PKG +
+             ";S.browser_fallback_url=" + encodeURIComponent(FAMPAY_STORE) +
+             ";end";
+    }
+    // iOS / desktop – still open UPI chooser
+    return "upi://pay?" + q;
+  }
+
   function makeQR(link){
     var box = $("qr"); box.innerHTML = "";
-    if (window.QRCode) new QRCode(box, {text:link, width:512, height:512, colorDark:"#0b1020", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.H});
-    else box.innerHTML = '<p style="color:#0b1020;font-weight:600">QR library could not load. Check your internet connection.</p>';
+    if (window.QRCode) new QRCode(box, {text:link, width:512, height:512, colorDark:"#0f172a", colorLight:"#ffffff", correctLevel:QRCode.CorrectLevel.H});
+    else box.innerHTML = '<p style="color:#0f172a;font-weight:600">QR library could not load. Check your internet connection.</p>';
   }
+
   function startTimer(){
     clearInterval(timer);
     var s = TOTAL, t = $("timeLeft"), bar = $("barFill");
     (function tick(){
-      t.textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
+      var mm = String(Math.floor(s/60)).padStart(2,"0");
+      var ss = String(s%60).padStart(2,"0");
+      t.textContent = mm + ":" + ss;
+      setTopTimer(s);
       bar.style.transform = "scaleX(" + (s/TOTAL) + ")";
       if (s <= 0) { clearInterval(timer); $("statusMsg").textContent = "This QR has expired. Ask for a new link."; return; }
       s--; timer = setTimeout(tick, 1000);
     })();
   }
+
   function showQR(){
     $("loadTitle").innerHTML = 'Creating payment<span class="dots"></span>';
     $("loadSub").textContent = "Generating your secure QR."; view("loading");
     setTimeout(function(){
-      var link = upiLink();
+      var stdLink = upiLink();
+      var famLink = fampayLink();
       $("amountShown").textContent = fmt(amount);
       $("upiText").textContent = UPI_ID;
-      $("payNowBtn").href = link; $("statusMsg").textContent = "";
-      makeQR(link); startTimer(); view("qr");
+      $("payNowBtn").href = famLink;
+      $("payNowBtn").setAttribute("data-fallback", stdLink);
+      $("statusMsg").textContent = "";
+      setTopAmount(amount);
+      makeQR(stdLink);
+      startTimer();
+      view("qr");
     }, 1300);
   }
 
-  /* ---- UTR check (same API as script.js) ---- */
   function flat(o, out, pre, depth){
     Object.keys(o).forEach(function(k){
       var v = o[k];
@@ -245,7 +771,7 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
     return out;
   }
   function confetti(){
-    var c = ["#ffb703","#2ee6c5","#ff5d73","#7b5cff","#fff"];
+    var c = ["#6366f1","#10b981","#f59e0b","#ef4444","#a855f7"];
     for (var i = 0; i < 60; i++) {
       var d = document.createElement("div"); d.className = "confetti";
       d.style.left = Math.random()*100 + "vw"; d.style.background = c[i % c.length];
@@ -295,7 +821,6 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
     }).catch(function(e){ result("bad", "Something went wrong", e.message, {success:false, error:e.message}, utr); });
   }
 
-  /* ---- events ---- */
   $("proceedBtn").addEventListener("click", function(){
     var v = parseFloat($("amount").value);
     if (!v || v < 1 || v > 10000000) { var f = $("field"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); $("amount").focus(); return; }
@@ -303,6 +828,25 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
   });
   $("amount").addEventListener("keydown", function(e){ if (e.key === "Enter") $("proceedBtn").click(); });
   document.querySelectorAll(".chips button").forEach(function(b){ b.addEventListener("click", function(){ $("amount").value = b.getAttribute("data-amt"); }); });
+
+  // Pay Now – let the browser handle the Android intent; fallback if needed
+  $("payNowBtn").addEventListener("click", function(e){
+    var href = this.getAttribute("href");
+    var fallback = this.getAttribute("data-fallback");
+    if (/^intent:/.test(href) && fallback) {
+      var handled = false;
+      var onBlur = function(){ handled = true; };
+      window.addEventListener("blur", onBlur, {once:true});
+      setTimeout(function(){
+        window.removeEventListener("blur", onBlur);
+        if (!handled) {
+          // If the app didn't open, fall back to the generic UPI chooser
+          window.location.href = fallback;
+        }
+      }, 1200);
+    }
+  });
+
   $("verifyBtn").addEventListener("click", function(){
     var u = $("utr").value.trim();
     if (u.length < 6) { var f = $("utrField"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); $("statusMsg").textContent = "Enter a valid UTR."; $("utr").focus(); return; }
@@ -315,10 +859,9 @@ details pre{margin:8px 0 0; padding:12px; border-radius:12px; background:rgba(0,
   });
   $("againBtn").addEventListener("click", function(){ if (amount) { $("utr").value = ""; showQR(); } else view("amount"); });
 
-  /* ---- start ---- */
   if (utrParam) verify(utrParam);
   else if (amount) showQR();
-  else view("amount");
+  else { setTopAmount(null); setTopTimer(TOTAL); view("amount"); }
 })();
 </script>
 </body>
