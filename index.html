@@ -22,7 +22,7 @@
   --warn-soft:#fffbeb;
   --danger:#ef4444;
   --danger-soft:#fef2f2;
-  --fam:#7c3aed;
+  --upi:#1a73e8;
   --radius:20px;
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -177,10 +177,10 @@ body{
   padding:28px 22px 24px;
   box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 32px -8px rgba(15,23,42,.10);
 }
-body[data-view=amount] #amountView,
 body[data-view=loading] #loadingView,
 body[data-view=qr] #qrView,
-body[data-view=result] #resultView{
+body[data-view=result] #resultView,
+body[data-view=error] #errorView{
   display:block;
   animation:cardIn .5s cubic-bezier(.2,.9,.3,1.05) both;
 }
@@ -198,6 +198,56 @@ h1{
   font-size:.92rem;
   line-height:1.55;
 }
+
+/* ============ Error view ============ */
+#errorView{text-align:center;padding:44px 22px 40px}
+.err-icon{
+  width:88px;height:88px;
+  margin:0 auto 22px;
+  border-radius:50%;
+  background:var(--danger-soft);
+  display:grid;place-items:center;
+  animation:pop .5s cubic-bezier(.2,.9,.3,1.5) both;
+}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+.err-icon svg{width:44px;height:44px}
+.err-icon svg *{stroke:var(--danger)}
+.err-code{
+  display:inline-block;
+  margin:0 0 16px;
+  padding:5px 12px;
+  border-radius:8px;
+  background:var(--danger-soft);
+  color:var(--danger);
+  font:600 .72rem "JetBrains Mono",monospace;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+#errorView h1{color:var(--danger)}
+#errorView .sub{margin-bottom:24px}
+.err-help{
+  padding:16px 18px;
+  border-radius:14px;
+  background:#f8fafc;
+  border:1px solid var(--line);
+  text-align:left;
+  font-size:.82rem;
+  color:var(--muted);
+  line-height:1.6;
+}
+.err-help b{color:var(--ink);display:block;margin-bottom:6px;font-size:.85rem}
+.err-help code{
+  display:inline-block;
+  margin-top:6px;
+  padding:4px 8px;
+  border-radius:6px;
+  background:#eef2ff;
+  color:var(--brand);
+  font:600 .78rem "JetBrains Mono",monospace;
+  word-break:break-all;
+}
+
+/* ============ Coin ============ */
 .coin{
   width:76px;height:76px;
   margin:0 auto 18px;
@@ -210,6 +260,8 @@ h1{
   animation:floaty 3.5s ease-in-out infinite;
 }
 @keyframes floaty{50%{transform:translateY(-6px)}}
+
+/* ============ Field ============ */
 .field{
   display:flex;align-items:center;gap:10px;
   padding:0 18px;height:72px;
@@ -232,30 +284,8 @@ h1{
   letter-spacing:-.03em;
 }
 .field input::placeholder{color:#cbd5e1}
-.field input::-webkit-outer-spin-button,
-.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.field input[type=number]{-moz-appearance:textfield;appearance:textfield}
 .field.shake{animation:shake .4s}
 @keyframes shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
-.chips{display:flex;gap:8px;margin:12px 0 8px}
-.chips button{
-  flex:1;padding:11px 0;
-  border-radius:12px;
-  border:1.5px solid var(--line);
-  background:#fff;
-  color:var(--ink);
-  font:600 .9rem "Plus Jakarta Sans",sans-serif;
-  cursor:pointer;
-  transition:.18s;
-}
-.chips button:hover{
-  background:var(--brand-soft);
-  border-color:var(--brand);
-  color:var(--brand);
-  transform:translateY(-1px);
-}
-.chips button:active{transform:scale(.97)}
-.limits{margin:8px 0 22px;color:var(--muted);font-size:.82rem;text-align:center}
 
 .btn{
   display:block;width:100%;height:54px;
@@ -282,6 +312,7 @@ h1{
   font-size:.8rem;
 }
 .secure b{color:var(--brand)}
+
 button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
   outline:3px solid var(--brand);
   outline-offset:3px;
@@ -410,11 +441,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
   display:flex;align-items:center;justify-content:center;gap:9px;
   height:54px;margin-bottom:8px;
   border-radius:14px;
-  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  background:linear-gradient(135deg,#2563eb,#1a73e8);
   color:#fff;
   font:700 1rem "Plus Jakarta Sans",sans-serif;
   text-decoration:none;
-  box-shadow:0 8px 22px -6px rgba(124,58,237,.5);
+  box-shadow:0 8px 22px -6px rgba(26,115,232,.5);
   transition:transform .15s,box-shadow .2s;
   position:relative;
   overflow:hidden;
@@ -431,7 +462,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
 @keyframes shine{60%,100%{left:140%}}
 .pay:hover{
   transform:translateY(-1px);
-  box-shadow:0 12px 28px -6px rgba(124,58,237,.6);
+  box-shadow:0 12px 28px -6px rgba(26,115,232,.6);
 }
 .pay-icon{
   width:22px;height:22px;
@@ -445,7 +476,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
   display:block;
   font-size:.62rem;
   font-weight:600;
-  opacity:.75;
+  opacity:.8;
   letter-spacing:.06em;
   text-transform:uppercase;
   margin-top:1px;
@@ -456,8 +487,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{
   font-size:.72rem;
   color:var(--muted);
   margin:0 0 20px;
+  line-height:1.5;
 }
-.fam-note b{color:var(--fam)}
+.fam-note b{color:var(--upi)}
+.apps-row{
+  display:flex;justify-content:center;gap:6px;margin:0 0 8px;flex-wrap:wrap;
+}
+.apps-row span{
+  font-size:.62rem;
+  font-weight:600;
+  padding:3px 8px;
+  border-radius:6px;
+  background:#f1f5f9;
+  color:var(--muted);
+  letter-spacing:.02em;
+}
 .verify{padding-top:20px;border-top:1px solid var(--line)}
 .verify .field{height:56px;border-radius:14px}
 .verify .field input{font:600 1rem "JetBrains Mono",monospace;letter-spacing:.04em}
@@ -564,7 +608,7 @@ details pre{
 }
 </style>
 </head>
-<body data-view="amount">
+<body data-view="error">
 
 <div class="page">
   <header class="topbar">
@@ -587,43 +631,47 @@ details pre{
         </div>
         <div class="topbar-item">
           <div class="label">Amount</div>
-          <div class="value big" id="topAmount">₹0</div>
+          <div class="value big" id="topAmount">—</div>
         </div>
         <div class="topbar-item">
           <div class="label">Time Left</div>
-          <div class="value" id="topTimer">30:00</div>
+          <div class="value" id="topTimer">—</div>
         </div>
       </div>
     </div>
   </header>
 
   <div class="wrap">
-    <main class="card" id="amountView">
-      <div class="coin" aria-hidden="true">₹</div>
-      <h1 style="text-align:center">Add money</h1>
-      <p class="sub" style="text-align:center">Enter an amount and we'll create your UPI QR instantly.</p>
-      <label class="field" id="field"><b>₹</b>
-        <input id="amount" type="number" inputmode="decimal" min="1" max="10000000" placeholder="0" aria-label="Amount in rupees">
-      </label>
-      <div class="chips">
-        <button type="button" data-amt="100">₹100</button>
-        <button type="button" data-amt="500">₹500</button>
-        <button type="button" data-amt="1000">₹1,000</button>
-      </div>
-      <p class="limits">Min ₹1 · Max ₹1,00,00,000</p>
-      <button class="btn btn-main" id="proceedBtn" type="button">Generate QR</button>
-      <p class="secure">🔒 100% secure · Powered by <b>Loot Bot Maker</b></p>
-    </main>
 
+    <!-- Error: amount missing -->
+    <section class="card" id="errorView" aria-live="polite">
+      <div class="err-icon" aria-hidden="true">
+        <svg viewBox="0 0 44 44" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="22" cy="22" r="18"/>
+          <path d="M22 12v14M22 32v1"/>
+        </svg>
+      </div>
+      <span class="err-code">Error · 400</span>
+      <h1>Amount not defined</h1>
+      <p class="sub">This payment link is missing the amount. Without a valid amount, we can't generate the UPI QR.</p>
+      <div class="err-help">
+        <b>What to do</b>
+        Please request a fresh link from the sender that includes the amount, for example:
+        <code>?amount=500</code>
+      </div>
+    </section>
+
+    <!-- Loading -->
     <section class="card" id="loadingView" aria-live="polite">
       <div class="spinner"></div>
       <h1 id="loadTitle" style="text-align:center">Creating payment<span class="dots"></span></h1>
       <p class="sub" id="loadSub" style="text-align:center">Generating your secure QR.</p>
     </section>
 
+    <!-- QR + verify -->
     <section class="card" id="qrView">
       <p class="step"><b>1</b> Scan the QR or tap Pay Now</p>
-      <div class="amt" id="amountShown">₹1</div>
+      <div class="amt" id="amountShown">₹0</div>
       <div class="qrbox">
         <div id="qr" role="img" aria-label="UPI payment QR code"></div>
         <div class="scan" aria-hidden="true"></div>
@@ -635,15 +683,17 @@ details pre{
         <div class="bar"><i id="barFill"></i></div>
       </div>
 
-      <!-- FamPay button -->
       <a class="pay" id="payNowBtn" href="#">
-        <span class="pay-icon">F</span>
+        <span class="pay-icon">➤</span>
         <span>
-          Pay with FamPay
-          <small>Opens directly in app</small>
+          Pay Now
+          <small>Choose any UPI app</small>
         </span>
       </a>
-      <p class="fam-note">Tap <b>Pay with FamPay</b> — opens the payment screen inside the FamPay app.</p>
+      <div class="apps-row" aria-hidden="true">
+        <span>GPay</span><span>PhonePe</span><span>Paytm</span><span>FamPay</span><span>BHIM</span><span>+ more</span>
+      </div>
+      <p class="fam-note">Tap <b>Pay Now</b> — a chooser will pop up showing all UPI apps installed on your phone. Pick the one you want to pay with.</p>
 
       <div class="verify">
         <p class="step"><b>2</b> Enter your UTR / transaction ID</p>
@@ -653,6 +703,7 @@ details pre{
       </div>
     </section>
 
+    <!-- Result -->
     <section class="card" id="resultView" aria-live="polite">
       <svg class="mark" viewBox="0 0 110 110" aria-hidden="true"><circle cx="55" cy="55" r="48"/><path id="markPath" d="M33 57l16 16 29-33"/></svg>
       <h1 id="resTitle"></h1>
@@ -662,6 +713,7 @@ details pre{
       <details><summary>Raw response</summary><pre id="rawJson"></pre></details>
       <button class="btn btn-main" id="againBtn" type="button">Done</button>
     </section>
+
   </div>
 </div>
 
@@ -669,9 +721,6 @@ details pre{
 <script>
 (function(){
   var UPI_ID = "dobariya.jenish@fam", PAYEE = "Jenish Dobariya", TOTAL = 30*60;
-  // ✅ Correct Android package for FamPay
-  var FAMPAY_PKG = "in.fampay.app";
-  var FAMPAY_STORE = "https://play.google.com/store/apps/details?id=in.fampay.app";
   var API = "https://script.google.com/macros/s/AKfycbx-mJyjZLjFLhjSzp-2F8Hz3ThNDtZ75xbujAtqL2aApNVlktLHO6fMp772lNOtJKPN/exec";
   var params = new URLSearchParams(window.location.search);
   var utrParam = (params.get("details") || "").trim();
@@ -684,6 +733,7 @@ details pre{
   function apiUrl(utr){ return API + "?utr=" + encodeURIComponent(utr) + (amount ? "&amount=" + amount : ""); }
   function fmt(n){ return "₹" + Number(n).toLocaleString("en-IN"); }
 
+  /* ---- Raw JSON mode ---- */
   if (params.get("format") === "json" || params.get("raw") === "1") {
     body.style = "display:block; margin:8px; padding:0; font-family:monospace; font-size:13px; background:white; color:black; word-wrap:break-word;";
     var pg = document.querySelector('.page'); if (pg) pg.style.display = 'none';
@@ -699,30 +749,13 @@ details pre{
     $("topTimer").textContent = String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0");
   }
 
+  /* ---- UPI ---- */
   function upiQuery(){
     var q = "pa=" + encodeURIComponent(UPI_ID) + "&pn=" + encodeURIComponent(PAYEE) + "&cu=INR";
     if (amount) q += "&am=" + amount.toFixed(2) + "&tn=" + encodeURIComponent("Deposit Rs " + amount);
     return q;
   }
   function upiLink(){ return "upi://pay?" + upiQuery(); }
-
-  /* ---- Android Intent that opens FamPay directly ---- */
-  function fampayLink(){
-    var q = upiQuery();
-    var ua = navigator.userAgent || "";
-    var isAndroid = /android/i.test(ua);
-
-    if (isAndroid) {
-      // ✅ Correct intent: package = in.fampay.app
-      // Fallback: open Play Store if FamPay is not installed
-      return "intent://pay?" + q +
-             "#Intent;scheme=upi;package=" + FAMPAY_PKG +
-             ";S.browser_fallback_url=" + encodeURIComponent(FAMPAY_STORE) +
-             ";end";
-    }
-    // iOS / desktop – still open UPI chooser
-    return "upi://pay?" + q;
-  }
 
   function makeQR(link){
     var box = $("qr"); box.innerHTML = "";
@@ -748,17 +781,13 @@ details pre{
     $("loadTitle").innerHTML = 'Creating payment<span class="dots"></span>';
     $("loadSub").textContent = "Generating your secure QR."; view("loading");
     setTimeout(function(){
-      var stdLink = upiLink();
-      var famLink = fampayLink();
+      var link = upiLink();
       $("amountShown").textContent = fmt(amount);
       $("upiText").textContent = UPI_ID;
-      $("payNowBtn").href = famLink;
-      $("payNowBtn").setAttribute("data-fallback", stdLink);
+      $("payNowBtn").href = link;
       $("statusMsg").textContent = "";
       setTopAmount(amount);
-      makeQR(stdLink);
-      startTimer();
-      view("qr");
+      makeQR(link); startTimer(); view("qr");
     }, 1300);
   }
 
@@ -821,32 +850,7 @@ details pre{
     }).catch(function(e){ result("bad", "Something went wrong", e.message, {success:false, error:e.message}, utr); });
   }
 
-  $("proceedBtn").addEventListener("click", function(){
-    var v = parseFloat($("amount").value);
-    if (!v || v < 1 || v > 10000000) { var f = $("field"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); $("amount").focus(); return; }
-    amount = Math.round(v*100)/100; showQR();
-  });
-  $("amount").addEventListener("keydown", function(e){ if (e.key === "Enter") $("proceedBtn").click(); });
-  document.querySelectorAll(".chips button").forEach(function(b){ b.addEventListener("click", function(){ $("amount").value = b.getAttribute("data-amt"); }); });
-
-  // Pay Now – let the browser handle the Android intent; fallback if needed
-  $("payNowBtn").addEventListener("click", function(e){
-    var href = this.getAttribute("href");
-    var fallback = this.getAttribute("data-fallback");
-    if (/^intent:/.test(href) && fallback) {
-      var handled = false;
-      var onBlur = function(){ handled = true; };
-      window.addEventListener("blur", onBlur, {once:true});
-      setTimeout(function(){
-        window.removeEventListener("blur", onBlur);
-        if (!handled) {
-          // If the app didn't open, fall back to the generic UPI chooser
-          window.location.href = fallback;
-        }
-      }, 1200);
-    }
-  });
-
+  /* ---- events ---- */
   $("verifyBtn").addEventListener("click", function(){
     var u = $("utr").value.trim();
     if (u.length < 6) { var f = $("utrField"); f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake"); $("statusMsg").textContent = "Enter a valid UTR."; $("utr").focus(); return; }
@@ -857,11 +861,17 @@ details pre{
     var m = $("copyBtn");
     (navigator.clipboard ? navigator.clipboard.writeText(UPI_ID) : Promise.reject()).then(function(){ m.textContent = "Copied"; setTimeout(function(){ m.textContent = "Copy"; }, 1500); }, function(){ m.textContent = "Select ID"; });
   });
-  $("againBtn").addEventListener("click", function(){ if (amount) { $("utr").value = ""; showQR(); } else view("amount"); });
+  $("againBtn").addEventListener("click", function(){ if (amount) { $("utr").value = ""; showQR(); } else view("error"); });
 
-  if (utrParam) verify(utrParam);
-  else if (amount) showQR();
-  else { setTopAmount(null); setTopTimer(TOTAL); view("amount"); }
+  /* ---- start ---- */
+  if (utrParam) { verify(utrParam); }
+  else if (amount) { setTopAmount(amount); showQR(); }
+  else {
+    // ❌ No amount in URL → refuse to load, show error
+    setTopAmount(null);
+    $("topTimer").textContent = "—";
+    view("error");
+  }
 })();
 </script>
 </body>
