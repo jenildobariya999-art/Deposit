@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-BkSabwWG.js";var t=e(),n=()=>(0,t.jsx)(`p`,{className:`mx-auto max-w-5xl px-4 py-16 text-center text-sm text-muted-foreground`,children:`No apps found.`});export{n as notFoundComponent};
