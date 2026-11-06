@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-BkSabwWG.js";var t=e(),n=({error:e})=>(0,t.jsx)(`p`,{role:`alert`,className:`mx-auto max-w-5xl px-4 py-16 text-center text-sm text-muted-foreground`,children:e.message});export{n as errorComponent};
